@@ -5,16 +5,12 @@ This image provides for Planemo development and RStudio package development (via
 
 ## Using a pre-built image 
 
-If you would like to use a pre-built image you can run
-```
-    docker pull eschen42/devplan
-```
-to get the latest (alpha) image, or you can find a tagged release at [https://hub.docker.com/r/eschen42/devplan/tags/](https://hub.docker.com/r/eschen42/devplan/tags/) and pull with
+If you would like to use a pre-built image you can find a tagged release at [https://hub.docker.com/r/eschen42/devplan/tags/](https://hub.docker.com/r/eschen42/devplan/tags/) and pull with
 ```
     docker pull eschen42/devplan:put-the-tag-here
 ```
 
-*If you use a pre-built image, skip ahead to step 2.*
+*If you use a pre-built image, skip Step 0 and Step 1.*
 
 ## Step 0 - Choose an R version
    - Choose an R version supported by bioconda and choose the corresponding version of rocker/verse, e.g.
