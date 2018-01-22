@@ -57,8 +57,9 @@
 ##        ```
 ## ## Step 7
 ##    - On the host, browse to RStudio at http://localhost:8787
+##    - Log into RStudio as user `rstudio` with password `rstudio`
 ## ## Step 8
-##    - On the host, browse to the test instance at http://localhost:8790
+##    - On the host, browse to the `planemo serve` instance at http://localhost:8790
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^[^##]/,$ d; /./!d; s/^## //; p' Dockerfile`
 
@@ -93,3 +94,5 @@ RUN apt-get -y install man-db manpages manpages-dev
 # In rocker/verse, /init starts up s6 services.
 #   Append to /init to log in the rstudio user after starting the s6 services.
 RUN echo "su - rstudio" >> /init
+
+COPY Dockerfile /Dockerfile
