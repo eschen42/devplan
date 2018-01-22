@@ -61,7 +61,7 @@
 ## ## Step 8
 ##    - On the host, browse to the `planemo serve` instance at http://localhost:8790
 
-# To view the header of this Dockerfile as markdown, run `sed -n -e '/^[^##]/,$ d; /./!d; s/^## //; p' Dockerfile`
+# To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; p' Dockerfile`
 
 FROM rocker/verse:3.4.1
 MAINTAINER Arthur C. Eschenlauer, esch0041@umn.edu

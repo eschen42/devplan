@@ -57,5 +57,6 @@ This image provides for Planemo development and RStudio package development (via
        ```
 ## Step 7
    - On the host, browse to RStudio at http://localhost:8787
+   - Log into RStudio as user `rstudio` with password `rstudio`
 ## Step 8
-   - On the host, browse to the test instance at http://localhost:8790
+   - On the host, browse to the `planemo serve` instance at http://localhost:8790
