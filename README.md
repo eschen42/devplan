@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/118467922.svg)](https://zenodo.org/badge/latestdoi/118467922)
+
 # devplan: a Docker image for RStudio and Planemo development
 This image provides for Planemo development and RStudio package development (via R package 'devtools') including vignette-building capability.
 ## Step 0
