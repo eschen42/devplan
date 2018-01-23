@@ -13,17 +13,18 @@
 ##     docker pull eschen42/devplan:put-the-tag-here
 ## ```
 ##
-## *You can now proceed to Step 2.*
+## *You can now proceed to Step 2.*  However, remember to supply the name of your image including the tag anywhere below that the instructions say `eschen42/devplan`.
+
 ##
 ## ### To build a customized image 
 ##
-## ### Choose an R version
+## #### Choose an R version
 ##    - Choose an R version supported by bioconda and choose the corresponding version of rocker/verse, e.g.
 ##    ```
 ##        conda search r-base
 ##    ```
 ##
-## ### Build your own image from the Dockerfile
+## #### Build your own image from the Dockerfile
 ##    - Build from this Dockerfile (you must cd to the directory containing it first)
 ##    ```
 ##        docker build -t eschen42/devplan .
