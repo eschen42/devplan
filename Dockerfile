@@ -93,6 +93,11 @@ RUN apt-get -y install man-db manpages manpages-dev
 
 # In rocker/verse, /init starts up s6 services.
 #   Append to /init to log in the rstudio user after starting the s6 services.
-RUN echo "su - rstudio" >> /init
+RUN  bash -c 'mv /init /init3'
+RUN  bash -c 'echo "su - rstudio" >> /init3'
+COPY init /init
+RUN  bash -c 'chmod +x /init'
+COPY init2 /init2
+RUN  bash -c 'chmod +x /init2'
 
 COPY Dockerfile /Dockerfile

@@ -1,0 +1,16 @@
+#!/bin/bash
+# Get ID for owner and group of /home/rstudio
+RSUID=$(ls -na /home/rstudio | grep ' [.]$' | sed -e 's/[ ][ ]*/:/g' | cut -f 3 -d ':')
+RSGID=$(ls -na /home/rstudio | grep ' [.]$' | sed -e 's/[ ][ ]*/:/g' | cut -f 4 -d ':')
+if [ $RSUID -ne 0 ]; then
+  # Owner is not root; probably we are not running in a MacOS Docker VM
+  if [ $RSUID -ne 0 ]; then
+    # Group is not root either
+    sed -i -e "s/:1000:1000:/:$RSUID:$RSGID:/g" /etc/passwd
+    sed -i -e "s/:1000:/:$RSGID:/g" /etc/group
+  else
+    # Group is root; however, it may be better not to set group of rstudio to root
+    sed -i -e "s/:1000:1000:/:$RSUID:1000:/g" /etc/passwd
+  fi
+fi
+
