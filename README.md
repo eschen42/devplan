@@ -42,6 +42,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -v ~/rstudio:/home/rstudio eschen42/devplan
    ```
    - At this point you can use RStudio; see Step 7 below.
+   - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
 
 ## Step 4 - Set up .ssh
    - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
@@ -55,6 +56,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
         virtualenv ~/venv
         . ~/venv/bin/activate
         pip install planemo
+        planemo conda_init
    ```
 
 ## Step 6 - Using Planemo from the guest command line
@@ -62,7 +64,6 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        - Run the following unless you have already activated the venv:
        ```
             . ~/venv/bin/activate
-            planemo conda_init
        ```
        - Clone the wrapper project you want to work with and cd to it.
        - Run the following the first time you run planemo and each time you change the conda dependencies:
