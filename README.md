@@ -1,24 +1,29 @@
 [![DOI](https://zenodo.org/badge/118467922.svg)](https://zenodo.org/badge/latestdoi/118467922)
 
 # devplan: a Docker image for RStudio and Planemo development
+
 This image provides for Planemo development and RStudio package development (via R package 'devtools') including vignette-building capability.
 
-## Using a pre-built image 
+## Step 1 - Get or build an image
+
+### To use a pre-built image 
 
 If you would like to use a pre-built image you can find a tagged release at [https://hub.docker.com/r/eschen42/devplan/tags/](https://hub.docker.com/r/eschen42/devplan/tags/) and pull with
 ```
     docker pull eschen42/devplan:put-the-tag-here
 ```
 
-*If you use a pre-built image, skip Step 0 and Step 1.*
+*You can now proceed to Step 2.*
 
-## Step 0 - Choose an R version
+### To build a customized image 
+
+### Choose an R version
    - Choose an R version supported by bioconda and choose the corresponding version of rocker/verse, e.g.
    ```
        conda search r-base
    ```
 
-## Step 1 - Build your own image from the Dockerfile
+### Build your own image from the Dockerfile
    - Build from this Dockerfile (you must cd to the directory containing it first)
    ```
        docker build -t eschen42/devplan .
