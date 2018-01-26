@@ -18,6 +18,12 @@ fi
 if [ -d galaxyproject-galaxy-* ]; then
   mv galaxyproject-galaxy-* galaxyproject-galaxy
 fi
-sed -e 's/http: 127.0.0.1:\([0-9]\)/http: 0.0.0.0:\1/' ~/shed/galaxyproject-galaxy/config/tool_shed.yml.sample > ~/shed/galaxyproject-galaxy/config/tool_shed.yml
-
+TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
+if [ ! -f $TOOLSHEDYML ]; then
+  # spacing here is critical - no extra spaces or tabs permitted
+  sed -e 's/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:\1\
+  static-map: \/static\/style=static\/style\/blue\
+  static-map: \/static=static\
+  /' $TOOLSHEDYML.sample > $TOOLSHEDYML
+fi
 # vim: ts=2 sw=2 et ai:
