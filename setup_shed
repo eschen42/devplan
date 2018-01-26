@@ -11,6 +11,12 @@ if [ -f $EXPECTED ]; then
 fi
 if [ ! -f $EXPECTED.tgz ]; then
   echo downloading tarball: $TARBALLURL
+  echo '
+    Setting up a new toolshed.
+    This involves both downloading files of significant size
+    and significant computation subsequently.
+    Please be patient.  Thank you.
+  '
   wget $TARBALLURL
   mv $EXPECTED $EXPECTED.tgz
   tar xzf $EXPECTED.tgz
@@ -34,4 +40,31 @@ if [ ! -f $TOOLSHEDYML ]; then
   }' $TOOLSHEDYML
 fi
 
+echo "
+  Now you will want to:
+    - Decide what email address you will want to register in the 
+      localshed tool shed.
+        e.g., john.doe@example.net
+    - Add that email address to $TOOLSHEDYML
+        e.g.,
+          admin_users: john.doe@example.net
+        ^^ Very important!  This line must begin with two spaces 
+        and appear below "tool_shed:"
+    - Run the toolshed with the command
+        /run_shed
+    - Browse to the port forwarded to the toolshed.
+        Probably this would be http://localhost:8709
+    - Register as a user with the email address chosen previously.
+    - Navigate to 'User > API Keys' and generate an API key.
+    - Replace the API key under 'localshed' in ~/.planemo.yml with 
+      the API key generated above.
+
+  These changes will be persistent, so that the next time you run 
+    /run_shed
+  you will not need to repeat them.
+
+  You are now set up to run
+    planemo shed_create -t localshed .
+  from the directory containing your tool definition XML file.
+"
 # vim: ts=2 sw=2 et ai:

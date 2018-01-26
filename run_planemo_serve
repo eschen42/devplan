@@ -1,0 +1,2 @@
+#!/bin/bash
+planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
