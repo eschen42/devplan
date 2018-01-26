@@ -46,20 +46,28 @@
 ##    - At this point you can use RStudio; see Step 7 below.
 ##    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
 ##
-## ## Step 4 - Set up .ssh
-##    - When you get to the command line using the invocation in step 3, you will be logged in as user `rstudio`.
+## ## Step 4 - Set up the rstudio home directory
 ##    - **Important:** *Perform this and all subsequent steps running as user `rstudio`.*
-##    - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
-##      and make sure that the permissions are right (see: https://superuser.com/a/215506)
-##
-## ## Step 5 - One-time Planemo set up on the guest
-##    - Set up access to git, preferably over ssh
-##    - Set up planemo in pip
+##    - When you get to the command line using the invocation in step 3, you will be logged in as user `rstudio`.
+##    - Run this script:
 ##    ```
-##         virtualenv ~/venv
-##         . ~/venv/bin/activate
-##         pip install planemo
-##         planemo conda_init
+##         /setup_home
+##    ```
+##    - The script essentially does the equivalent of the following:
+##    ```
+##         virtualenv ~/venv      # create a virtual environment
+##         . ~/venv/bin/activate  # make the environment active
+##         pip install planemo    # install planemo
+##         planemo conda_init     # set up conda in ~/miniconda3
+##    ```
+##
+## ## Step 5 - Set up .ssh and git
+##    - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
+##      and make sure that the permissions are right (For further info, see: https://superuser.com/a/215506)
+##    - Set up git global variables
+##    ```
+##         git config --global --add user.name "John Doe"
+##         git config --global --add user.email "jdoe@example.net"
 ##    ```
 ##
 ## ## Step 6 - Using Planemo from the guest command line
@@ -132,5 +140,7 @@ COPY setup_home /setup_home
 RUN  bash -c 'chmod +x /setup_home'
 COPY setup_shed /setup_shed
 RUN  bash -c 'chmod +x /setup_shed'
+COPY run_shed /run_shed
+RUN  bash -c 'chmod +x /run_shed'
 
 COPY Dockerfile /Dockerfile

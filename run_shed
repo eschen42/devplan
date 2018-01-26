@@ -1,0 +1,18 @@
+#!/bin/bash
+### set up toolshed
+if [ ! -d ~/shed ]; then
+  /setup_shed
+fi
+TEMP_LOG_FILE=~/toolshed.log
+> "$TEMP_LOG_FILE"
+nohup ~/shed/galaxyproject-galaxy/run_tool_shed.sh &> "$TEMP_LOG_FILE" & 
+LASTPID=$!
+
+echo Toolshed is running as $LASTPID
+echo When it is up it will be listening on 127.0.0.1:9009
+echo "To see the toolshed log, 'tail -f \"$TEMP_LOG_FILE\"'"
+echo "To kill the toolshed process, 'kill -HUP $LASTPID'"
+
+# vim: ts=2 sw=2 et ai:
+
+

@@ -1,25 +1,86 @@
 #!/bin/bash
 # One-time set up on the guest
 
-# - Set up planemo in pip
+# - Create virtual environment for pip
 if [ ! -d ~/venv ]; then
   virtualenv ~/venv
+  RESULT=$?
   HADVENV=0
 else
   HADVENV=1
 fi
+if [ ! -d ~/venv ]; then
+  echo "
+    Failed to create ~/venv.
+    Is it possible that the directory passed to the Docker 
+      container to persist /home/rstudio was created by root 
+      rather than an unprivileged user?
+    If so, you will need to exit the container (using the)
+      command 'exit' and restart it with a directory
+      that is writable by an unprivileged user.
+  "
+  exit 1
+fi
+
+# - Activate (and confirm) the virtual environment
 . ~/venv/bin/activate
+if [ `which pip`_ != ~/venv/bin/pip_ ]; then
+  echo "
+    \$PATH=$PATH
+    ~/venv/bin/pip is not the first pip on your path.
+    You may want to 'rm -rf ~/venv' and try running '/setup_home' again.
+  "
+  exit 1
+fi
+if [ `which python`_ != ~/venv/bin/python_ ]; then
+  echo "
+    \$PATH=$PATH
+    ~/venv/bin/python is not the first python on your path.
+    You may want to 'rm -rf ~/venv' and try running '/setup_home' again.
+  "
+  exit 1
+fi
+
+# - Install planemo in the virtual environment using pip
 which planmeo
 if [ $? -ne 0 ]; then
   pip install planemo
   HADVENV=0
 fi
-planemo conda_init
+if [ `which planemo`_ != ~/venv/bin/planemo_ ]; then
+  echo "
+    planemo did not install in ~/venv.
+    Please check your network connection, then try running '/setup_home' 
+      again.  If that does not help, you may want to 
+      'rm -rf ~/venv' and try running '/setup_home' again.
+  "
+  exit 1
+fi
+
+# - Initialize conda from planemo
+if [ -d  ~/miniconda3/bin/conda ]; then
+  echo "
+    ~/miniconda3/bin/conda already exists, so I won't run planemo conda_init
+  "
+else
+  planemo conda_init
+  RESULT=$?
+  if [ $RESULT -ne 0 ]; then
+    rm -rf ~/miniconda3
+    echo "
+      Errors occurred while planemo was installing conda.
+      Please check your network connection, then try running '/setup_home' 
+        again.  If that does not help, you may want to 
+        'rm -rf ~/venv' and try running '/setup_home' again.
+    "
+    exit 1
+  fi
+fi
 
 # - set up ~/.profile
 if [ ! -f ~/.profile ]; then
   echo '
-    export PATH="$HOME/miniconda3/bin:/usr/local/bin:/usr/bin:/bin"
+    export PATH="/usr/local/bin:/usr/bin:/bin"
     eval `ssh-agent -s`
     echo "use ssh-add to add keys to the ssh-agent"
   ' | sed -e 's/^    //' > ~/.profile
@@ -160,5 +221,8 @@ if [ $HADVENV -eq 0 ]; then
     or log out and then log in.
 
     You only have to do this once.
+
+    If you want to run a toolshed, run
+      /setup_shed
   ' | sed -e 's/^    //'
 fi

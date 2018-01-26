@@ -1,6 +1,23 @@
 #!/bin/bash
 ### set up toolshed
-if [ ! -d ~/.planemo ]; then
-  mkdir ~/.planemo
+if [ ! -d ~/shed ]; then
+  mkdir ~/shed
 fi
-git clone --bare  'https://github.com/galaxyproject/galaxy' "~/.planemo/gx_toolshed_repo"
+cd ~/shed
+TARBALLURL=$( curl --silent https://api.github.com/repos/galaxyproject/galaxy/tags | grep tarball_url | head -n 1 | sed -e 's/.*https:/https:/; s/".*$//;' )
+EXPECTED=$( echo $TARBALLURL | sed -e 's/.*[/]//' )
+if [ -f $EXPECTED ]; then
+  rm $EXPECTED
+fi
+if [ ! -f $EXPECTED.tgz ]; then
+  echo downloading tarball: $TARBALLURL
+  wget $TARBALLURL
+  mv $EXPECTED $EXPECTED.tgz
+  tar xzf $EXPECTED.tgz
+fi
+if [ -d galaxyproject-galaxy-* ]; then
+  mv galaxyproject-galaxy-* galaxyproject-galaxy
+fi
+sed -e 's/http: 127.0.0.1:\([0-9]\)/http: 0.0.0.0:\1/' ~/shed/galaxyproject-galaxy/config/tool_shed.yml.sample > ~/shed/galaxyproject-galaxy/config/tool_shed.yml
+
+# vim: ts=2 sw=2 et ai:
