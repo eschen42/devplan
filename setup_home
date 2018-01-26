@@ -161,7 +161,8 @@ if [ ! -f ~/.ssh/id_rsa ]; then
     and then "chmod 700 ~/.ssh/id_rsa".
   ' | sed -e 's/^    //'
 fi
-chmod 700 ~ ~/.ssh ~/.ssh/id_rsa
+chmod 700 ~ ~/.ssh
+chmod 600 ~/.ssh/id_rsa
 
 # - prompt setup for git
 if [ ! -f ~/.gitconfig ]; then
