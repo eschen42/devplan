@@ -21,9 +21,17 @@ fi
 TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
 if [ ! -f $TOOLSHEDYML ]; then
   # spacing here is critical - no extra spaces or tabs permitted
-  sed -e 's/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:\1\
-  static-map: \/static\/style=static\/style\/blue\
-  static-map: \/static=static\
-  /' $TOOLSHEDYML.sample > $TOOLSHEDYML
+  sed -e 's/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:\1/' $TOOLSHEDYML.sample > $TOOLSHEDYML
+  grep 'static-map: static=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
+  # do not change indentation here - it is critical to YAML format
+  s/$/\
+  static-map: \/static=static/
+  }' $TOOLSHEDYML
+  grep 'static-map: static\/style=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
+  # do not change indentation here - it is critical to YAML format
+  s/$/\
+  static-map: \/static\/style=static\/style\/blue/
+  }' $TOOLSHEDYML
 fi
+
 # vim: ts=2 sw=2 et ai:
