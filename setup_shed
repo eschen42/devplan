@@ -1,0 +1,6 @@
+#!/bin/bash
+### set up toolshed
+if [ ! -d ~/.planemo ]; then
+  mkdir ~/.planemo
+fi
+git clone --bare  'https://github.com/galaxyproject/galaxy' "~/.planemo/gx_toolshed_repo"

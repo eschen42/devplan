@@ -34,10 +34,12 @@ If you would like to use a pre-built image you can find a tagged release at [htt
    ```
        mkdir ~/rstudio
    ```
+   - Important: Files created within ~/rstudio will be owned by the owner of ~/rstudio (and have the same group as ~/rstudio).
+     -  Make sure that you adjust ~/rstudio userid and groupid with `chown` *before* you perform step 3.
 
 ## Step 3 - Run a new container instance from the image
-   - Run the container with this new directory; note that the container will create
-     files in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
+   - Run the container with this new directory; note that the container will create files 
+     in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
    ```
        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -v ~/rstudio:/home/rstudio eschen42/devplan
    ```
@@ -45,9 +47,10 @@ If you would like to use a pre-built image you can find a tagged release at [htt
    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
 
 ## Step 4 - Set up .ssh
+   - When you get to the command line using the invocation in step 3, you will be logged in as user `rstudio`.
+   - **Important:** *Perform this and all subsequent steps running as user `rstudio`.*
    - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
      and make sure that the permissions are right (see: https://superuser.com/a/215506)
-
 
 ## Step 5 - One-time Planemo set up on the guest
    - Set up access to git, preferably over ssh
@@ -85,3 +88,4 @@ If you would like to use a pre-built image you can find a tagged release at [htt
 
 ## Step 8 - Browsing results for `planemo serve`
    - On the host, browse to the `planemo serve` instance at http://localhost:8790
+

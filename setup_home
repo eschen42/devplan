@@ -1,0 +1,164 @@
+#!/bin/bash
+# One-time set up on the guest
+
+# - Set up planemo in pip
+if [ ! -d ~/venv ]; then
+  virtualenv ~/venv
+  HADVENV=0
+else
+  HADVENV=1
+fi
+. ~/venv/bin/activate
+which planmeo
+if [ $? -ne 0 ]; then
+  pip install planemo
+  HADVENV=0
+fi
+planemo conda_init
+
+# - set up ~/.profile
+if [ ! -f ~/.profile ]; then
+  echo '
+    export PATH="$HOME/miniconda3/bin:/usr/local/bin:/usr/bin:/bin"
+    eval `ssh-agent -s`
+    echo "use ssh-add to add keys to the ssh-agent"
+  ' | sed -e 's/^    //' > ~/.profile
+fi
+
+# - set up ~/.bash_profile
+if [ ! -f ~/.bash_profile ]; then
+  echo '
+    . ~/.profile
+    . ~/.bashrc
+  ' | sed -e 's/^    //' > ~/.bash_profile
+fi
+
+# - set up ~/.bash_logout
+if [ ! -f ~/.bash_logout ]; then
+  echo '
+    if [ "$SHLVL" = 1 ]; then
+      echo killing ssh agent $SSH_AGENT_PID
+      kill $SSH_AGENT_PID
+    fi
+  ' | sed -e 's/^    //' > ~/.bash_logout
+fi
+
+# - set up ~/.bashrc.d
+if [ ! -d ~/.bashrc.d ]; then
+  mkdir ~/.bashrc.d
+  echo '
+    # source additional entries from files within ~/.bashrc.d
+    for f in ~/.bashrc.d/*; do
+        # echo Sourcing $f
+        . $f
+    done
+  ' | sed -e 's/^    //' >> ~/.bashrc
+  echo '
+    EDITOR=vim; export EDITOR
+  ' | sed -e "s/^    //" >> ~/.bashrc.d/env
+  echo '
+    # set vi/readline for shell
+    set -o vi
+
+    # set the venv
+    . ~/venv/bin/activate
+  ' | sed -e 's/^    //' >> ~/.bashrc.d/setup
+  echo '
+    # alias xd uses od in byte-wise hex-dump format; this is a slight variant on xxd
+    alias xd="od -A x -t x1z -v"
+
+    # implement the classic Unix rehash command
+    alias rehash="hash -r"
+
+    # show a treelist of processes including PID and command line
+    alias pstree="pstree -a -p"
+  ' | sed -e 's/^    //' >> ~/.bashrc.d/alias
+fi
+
+# - Set up .Rprofile and local library
+if [ ! -d ~/lib/R ]; then
+  mkdir -p ~/lib/R
+fi
+if [ -f ~/.Rprofile ]; then
+  echo '
+    .libPaths( c( "~/lib/R", .libPaths() ) )
+  ' | sed -e 's/^    //' >> ~/.Rprofile
+fi
+
+##### user prompts for git, ssh, and planemo access
+
+# - Set up ssh for access to git
+if [ ! -d ~/.ssh ]; then
+  mkdir ~/.ssh
+fi
+if [ ! -f ~/.ssh/id_rsa ]; then
+  touch ~/.ssh/id_rsa
+  echo '
+    TODO: If you want to access git over ssh, then you may want
+      - either to create new ~/.ssh/id_rsa using "ssh-keygen"
+      - or to copy an existing private key to ~/.ssh/id_rsa
+    and then "chmod 700 ~/.ssh/id_rsa".
+  ' | sed -e 's/^    //'
+fi
+chmod 700 ~ ~/.ssh ~/.ssh/id_rsa
+
+# - prompt setup for git
+if [ ! -f ~/.gitconfig ]; then
+  echo '
+    You may want to set up global info for git, e.g.:
+    git config --global --add user.name "John Doe"
+    git config --global --add user.email "jdoe@example.net"
+  ' | sed -e 's/^    //'
+fi
+
+# - prompt setup for planemo
+if [ ! -f ~/.planemo.yml ]; then
+  echo '
+    ## Planemo Global Configuration File.
+    ## Everything in this file is completely optional - these values can all be
+    ## configured via command line options for the corresponding commands.
+
+    ## Please note that this is a YAML file, so exact indentation is important.
+
+    ## Specify a default galaxy_root for test and server commands here.
+    #galaxy_root: /path/to/galaxy_root
+
+    ## Specify github credentials for publishing gist links (e.g. with
+    ## the `share_test` command).
+    github:
+      username: yourGitHubUserID
+      password: yourGitHubPassword
+
+    ## Username used with toolshed(s).
+    shed_username: "yourToolshedUserID"
+    sheds:
+      # For each tool shed you wish to target, uncomment key or both email and
+      # password.
+      toolshed:
+        #key: "<TODO>"
+        #email: "<TODO>"
+        #password: "<TODO>"
+      testtoolshed:
+        #key: "<TODO>"
+        #email: "<TODO>"
+        #password: "<TODO>"
+      localshed:
+        key: "1e9b0f7d3a960d849da2b09ca18922b5"
+        url: "http://127.0.0.1:9009/"
+        #email: "<TODO>"
+        #password: "<TODO>"
+  ' | sed -e 's/^    //' > ~/.planemo.yml
+  echo '
+    Please update your credentials into ~/.planemo.yml
+  ' | sed -e 's/^    //'
+fi
+
+if [ $HADVENV -eq 0 ]; then
+  echo '
+    To make your changes effective, run
+      bash -l
+    or log out and then log in.
+
+    You only have to do this once.
+  ' | sed -e 's/^    //'
+fi
