@@ -46,20 +46,28 @@ If you would like to use a pre-built image you can find a tagged release at [htt
    - At this point you can use RStudio; see Step 7 below.
    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
 
-## Step 4 - Set up .ssh
-   - When you get to the command line using the invocation in step 3, you will be logged in as user `rstudio`.
+## Step 4 - Set up the rstudio home directory
    - **Important:** *Perform this and all subsequent steps running as user `rstudio`.*
-   - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
-     and make sure that the permissions are right (see: https://superuser.com/a/215506)
-
-## Step 5 - One-time Planemo set up on the guest
-   - Set up access to git, preferably over ssh
-   - Set up planemo in pip
+   - When you get to the command line using the invocation in step 3, you will be logged in as user `rstudio`.
+   - Run this script:
    ```
-        virtualenv ~/venv
-        . ~/venv/bin/activate
-        pip install planemo
-        planemo conda_init
+        /setup_home
+   ```
+   - The script essentially does the equivalent of the following:
+   ```
+        virtualenv ~/venv      # create a virtual environment
+        . ~/venv/bin/activate  # make the environment active
+        pip install planemo    # install planemo
+        planemo conda_init     # set up conda in ~/miniconda3
+   ```
+
+## Step 5 - Set up .ssh and git
+   - Set up /home/rstudio/.ssh (on the guest; ~/devplan/.ssh on the host) if desired
+     and make sure that the permissions are right (For further info, see: https://superuser.com/a/215506)
+   - Set up git global variables
+   ```
+        git config --global --add user.name "John Doe"
+        git config --global --add user.email "jdoe@example.net"
    ```
 
 ## Step 6 - Using Planemo from the guest command line
@@ -81,11 +89,30 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        ```
             planemo serve --host 0.0.0.0 --conda_dependency_resolution .
        ```
+       - Because you can live-edit your tool and wrapper, you may find it more convenient
+         to have a daemon serve the current directory:
+       ```
+            planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
+            # or, equivalently
+            /run_planemo_serve
+       ```
 
-## Step 7 - Running RStudio
+## Step 7 - Setting up the `localshed` tool shed
+You can set up a local instance of the Galaxy toolshed; this requires a moderate amount of manual effort:
+  - To begin, run the command
+       ```
+            /setup_shed
+       ```
+
+## Step 8 - Running RStudio
    - On the host, browse to RStudio at http://localhost:8787
    - Log into RStudio as user `rstudio` with password `rstudio`
 
-## Step 8 - Browsing results for `planemo serve`
+## Step 9 - Browsing results for `planemo serve`
+   - On the guest, execute `/run_planemo_serve`
    - On the host, browse to the `planemo serve` instance at http://localhost:8790
+
+## Step 9 - Browsing local toolshed
+   - On the guest, execute `/run_shed`
+   - On the host, browse to http://localhost:8709
 

@@ -43,7 +43,7 @@ fi
 echo "
   Now you will want to:
     - Decide what email address you will want to register in the 
-      localshed tool shed.
+      'localshed' tool shed.
         e.g., john.doe@example.net
     - Add that email address to $TOOLSHEDYML
         e.g.,
@@ -53,9 +53,11 @@ echo "
     - Run the toolshed with the command
         /run_shed
     - Browse to the port forwarded to the toolshed.
-        Probably this would be http://localhost:8709
-    - Register as a user with the email address chosen previously.
-    - Navigate to 'User > API Keys' and generate an API key.
+      - Probably this would be http://localhost:8709
+      - Register as a user with the email address chosen previously.
+      - Add the shed category (or categories) appropriate for your tool
+      - Navigate to 'User > API Keys' and generate an API key.
+      - Copy the API key.
     - Replace the API key under 'localshed' in ~/.planemo.yml with 
       the API key generated above.
 
@@ -63,7 +65,7 @@ echo "
     /run_shed
   you will not need to repeat them.
 
-  You are now set up to run
+  When '/run_shed' is running, you may run
     planemo shed_create -t localshed .
   from the directory containing your tool definition XML file.
 "

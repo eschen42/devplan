@@ -1,2 +1,44 @@
 #!/bin/bash
-planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
+PLANEMOPARMS="$*"
+usage ()
+{
+  echo '
+  Usage: run_planemo_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
+  e.g.:  run_planemo_serve -t localshed    --port 8791
+  Take the toolshed name from ~/.planemo.yml
+  '
+}
+if [ $1_ == _ ]; then
+  usage
+  exit 1
+fi
+if [ $1_ == --help_ ]; then
+  usage
+  exit 0
+fi
+if [ -d ~/shed/galaxyproject-galaxy ]; then
+  GALAXYROOT="--galaxy_root $HOME/shed/galaxyproject-galaxy/"
+else
+  GALAXYROOT=
+fi
+echo GALAXYROOT=$GALAXYROOT
+
+TEMP_LOG_FILE=~/planemoshedserve.log
+nohup ( \
+  > "$TEMP_LOG_FILE" \
+  planemo shed_serve \
+  $PLANEMOPARMS \
+  $GALAXYROOT \
+  --host 0.0.0.0 \
+  --conda_dependency_resolution \
+  . \
+  &> "$TEMP_LOG_FILE" & \
+)
+LASTPID=$!
+
+echo 'planemo shed_serve' is running as $LASTPID
+echo When it is up it will be listening on 127.0.0.1:9090
+echo "To see the 'planemo shed_serve' log, 'tail -f \"$TEMP_LOG_FILE\"'"
+
+# vim: ts=2 sw=2 et ai:
+

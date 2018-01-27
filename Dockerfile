@@ -89,7 +89,7 @@
 ##        ```
 ##             planemo serve --host 0.0.0.0 --conda_dependency_resolution .
 ##        ```
-##        - Because you can live-edit your tool and wrapper, you may find it more convenient 
+##        - Because you can live-edit your tool and wrapper, you may find it more convenient
 ##          to have a daemon serve the current directory:
 ##        ```
 ##             planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
@@ -109,7 +109,12 @@
 ##    - Log into RStudio as user `rstudio` with password `rstudio`
 ##
 ## ## Step 9 - Browsing results for `planemo serve`
+##    - On the guest, execute `/run_planemo_serve`
 ##    - On the host, browse to the `planemo serve` instance at http://localhost:8790
+##
+## ## Step 9 - Browsing local toolshed
+##    - On the guest, execute `/run_shed`
+##    - On the host, browse to http://localhost:8709
 ##
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' Dockerfile`
