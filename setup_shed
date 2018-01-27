@@ -1,4 +1,45 @@
 #!/bin/bash
+### argument parsing courtesy of https://argbash.io
+die()
+{
+  local _ret=$2
+  test -n "$_ret" || _ret=1
+  test "$_PRINT_HELP" = yes && print_help >&2
+  echo "$1" >&2
+  exit ${_ret}
+}
+_arg_port="9009"
+print_help ()
+{
+  printf 'Usage: %s [-p|--port <arg>]\n' "$0"
+  printf "\t%s\n" "-p,--port: port for toolshed listener (default: '"9009"')"
+}
+parse_commandline ()
+{
+  while test $# -gt 0
+  do
+    _key="$1"
+    case "$_key" in
+      -p|--port)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_port="$2"
+        shift
+        ;;
+      --port=*)
+        _arg_port="${_key##--port=}"
+        ;;
+      -p*)
+        _arg_port="${_key##-p}"
+        ;;
+      *)
+        _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+        ;;
+    esac
+    shift
+  done
+}
+parse_commandline "$@"
+
 ### set up toolshed
 if [ ! -d ~/shed ]; then
   mkdir ~/shed
@@ -27,7 +68,7 @@ fi
 TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
 if [ ! -f $TOOLSHEDYML ]; then
   # spacing here is critical - no extra spaces or tabs permitted
-  sed -e 's/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:\1/' $TOOLSHEDYML.sample > $TOOLSHEDYML
+  sed -e "s/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:$_arg_port/" $TOOLSHEDYML.sample > $TOOLSHEDYML
   grep 'static-map: static=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
   # do not change indentation here - it is critical to YAML format
   s/$/\
