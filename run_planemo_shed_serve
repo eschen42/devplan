@@ -3,9 +3,9 @@ PLANEMOPARMS="$*"
 usage ()
 {
   echo '
-  Usage: /run_planemo_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
-   e.g.: /run_planemo_serve -t localshed    --port 9090
-     or: /run_planemo_serve -t localshed
+  Usage: /run_planemo_shed_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
+   e.g.: /run_planemo_shed_serve -t localshed    --port 9090
+     or: /run_planemo_shed_serve -t localshed
   Take the toolshed name from ~/.planemo.yml
   If you do not supply the port argument, "planemo shed_serve" will listen on port 9090 by default.
   '
@@ -37,7 +37,7 @@ LASTPID=$!
 cat << .
    'planemo shed_serve' is running as process ID $LASTPID
      - When it is up it will be listening on port 9090 unless 
-       you invoked /run_planemo_serve with the --port argument.
+       you invoked /run_planemo_shed_serve with the --port argument.
      - To see the 'planemo shed_serve' log:
          tail -f $TEMP_LOG_FILE
      - You can shut down 'planemo shed_serve' with the command:

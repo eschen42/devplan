@@ -2,11 +2,46 @@
 
 # devplan: a Docker image for RStudio and Planemo development
 
-This image provides for Planemo development and RStudio package development (via R package 'devtools') including vignette-building capability.
+This image provides for Planemo development and RStudio package development:
+
+  - R 3.4.1
+  - RStudio, using this version of R.
+  - The R package `devtools` for package development, including vignette-building capability.
+  - The lastest version of Planemo (currently 0.47.0) for development and testing of Galaxy tool wrappers.
+  - Support for running a local tool shed with the container to test creating and updating tools in the tool shed.
+  - Support for running `planemo serve` to test a tool wrapper and see the effect of changes "live".
+  - Support for running `planemo shed_serve` to test installability Galaxy of tools from a tool shed.
+
+# Motivation
+
+I develop R packages in RStudio using the devtools R library, and then I use Planemo to wrap them as Galaxy tools.  This has presented a few challenges:
+
+  - I want to keep the version of R with which I built a package in sync with the bioconda package dependency in the declaration of the Galaxy wrapper.
+  - I want an environment in which I
+    - can develop and test my R packages,
+    - can develop and test Galaxy wrappers,
+    - can test adding or updating the wrapper in a Galaxy tool shed, without resorting to using the public test tool shed,
+    - can validate that my tool as deployed to a tool shed will successfully install in a Galaxy instance, without resorting to using the public test tool shed.
+  - I have found myself recurrently creating a development environment customized for my use on several machines and operating systems.
+    - The versions and behaviors of the various tools, some of which are fairly complex, drifts significantly among my installations.
+    - I have had times in the past when the version R installed with RStudio was ahead of `r-base` in bioconda.
+  - I therefore wanted a Docker image that will run the same way everywhere,
+    so that I can focus on my work without wasting much effort adapting to the platform on which I am working at the moment.
+
+I therefore developed this Docker image to bring together into one place functionality that I have not found in an image available elsewhere.
+  - Points of departure:
+    - The base Docker image is rocker/verse:3.4.1, which allows me to make sure that I will always be building packages that target that version.
+      - When I want to use a newer version of R, I will rebuild the image.
+    - The planemo/interactive Docker image is great, but I would like to have everything in a single image
+      rather than using docker-compose to map ports and volumes among several images.
+      - That approach is quite viable, but it adds complexity that is not easy to explain to others.
+    - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
+
+# How to use this Docker image
 
 ## Step 1 - Get or build an image
 
-### To use a pre-built image 
+### To use a pre-built image
 
 If you would like to use a pre-built image you can find a tagged release at [https://hub.docker.com/r/eschen42/devplan/tags/](https://hub.docker.com/r/eschen42/devplan/tags/) and pull with
 ```
@@ -15,7 +50,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
 
 *You can now proceed to Step 2.*  However, remember to supply the name of your image including the tag anywhere below that the instructions say `eschen42/devplan`.
 
-### To build a customized image 
+### To build a customized image
 
 #### Choose an R version
    - Choose an R version supported by bioconda and choose the corresponding version of rocker/verse, e.g.
@@ -38,7 +73,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
      -  Make sure that you adjust ~/rstudio userid and groupid with `chown` *before* you perform step 3.
 
 ## Step 3 - Run a new container instance from the image
-   - Run the container with this new directory; note that the container will create files 
+   - Run the container with this new directory; note that the container will create files
      in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
    ```
        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -v ~/rstudio:/home/rstudio eschen42/devplan
@@ -94,11 +129,11 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        ```
             planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
             # or, equivalently
-            /run_planemo_serve
+            /run_planemo_shed_serve
        ```
 
 ## Step 7 - Setting up the `localshed` tool shed
-You can set up a local instance of the Galaxy toolshed; this requires a moderate amount of manual effort:
+You can set up a local instance of the Galaxy tool shed; this requires a moderate amount of manual effort:
   - To begin, run the command
        ```
             /setup_shed
@@ -108,11 +143,33 @@ You can set up a local instance of the Galaxy toolshed; this requires a moderate
    - On the host, browse to RStudio at http://localhost:8787
    - Log into RStudio as user `rstudio` with password `rstudio`
 
-## Step 9 - Browsing results for `planemo serve`
-   - On the guest, execute `/run_planemo_serve`
-   - On the host, browse to the `planemo serve` instance at http://localhost:8790
+## Step 9 - Running `planemo serve`
+   - One great thing about `planemo serve` is that you can see changes to your tool wrapper "live":
+     - You can edit the tool in your tool directory, then click the tool name in the tool frame on
+       the left side of your browser and see the effect immediately.
+   - On the guest,
+     - `cd` to the directory with the source code for your Galaxy tool;
+     - run the `/run_planemo_serve` convenience script
+       - or, run `planemo serve` with the parameters of your choice.
+   - On the host,
+     - browse to the `planemo serve` instance at http://localhost:8790
 
-## Step 9 - Browsing local toolshed
-   - On the guest, execute `/run_shed`
+## Step 10 - Browsing local tool shed
+   - On the guest, execute `/run_shed` and make note of the process ID in case you will need to shut down the tool shed.
+     - For instance, suppose it starts with PID 243.
    - On the host, browse to http://localhost:8709
+   - To shut down the tool shed, on the guest, execute `/kill_tree`
+     - For the example above, run `/kill_tree --pid 243`
+
+## Step 11 - Browsing results for `planemo shed_serve`
+   - On the guest,
+     - make sure that you started the tool shed, as described in Step 10.
+       - Make note of the process ID in case you want to shut it down later.
+       - For instance, suppose it starts with PID 442.
+     - run `/run_planemo_shed_serve -t localshed`
+       - or, run `planemo shed_serve` with the parameters of your choice.
+       - You will either have to make sure that `planemo serve` is not running
+         or run `planemo shed_serve` on a different port.
+   - On the host, browse to the `planemo shed_serve` instance at http://localhost:8790
+     - For the example above, run `kill -TERM 442`
 
