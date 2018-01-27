@@ -8,9 +8,9 @@ This image provides for Planemo development and RStudio package development:
   - RStudio, using this version of R.
   - The R package `devtools` for package development, including vignette-building capability.
   - The lastest version of Planemo (currently 0.47.0) for development and testing of Galaxy tool wrappers.
-  - Support for running a local tool shed with the container to test creating and updating tools in the tool shed.
-  - Support for running `planemo serve` to test a tool wrapper and see the effect of changes "live".
-  - Support for running `planemo shed_serve` to test installability Galaxy of tools from a tool shed.
+  - Extra support for running a local tool shed with the container to test creating and updating tools in the tool shed.
+  - Extra support for running `planemo serve` to test a tool wrapper and see the effect of changes "live".
+  - Extra support for running `planemo shed_serve` to test installability Galaxy of tools from a tool shed.
 
 # Motivation
 
