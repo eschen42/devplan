@@ -1,5 +1,10 @@
 #!/bin/bash
 ### argument parsing courtesy of https://argbash.io
+# ARG_OPTIONAL_SINGLE([port], p, [port for toolshed listener], [9009])
+# ARG_OPTIONAL_SINGLE([admin], a, [email for admin user, separate multiple emails with commas], [admin@galaxy.org])
+# ARGBASH_SET_INDENT([  ])
+# ARG_HELP([])
+# ARGBASH_GO()
 die()
 {
   local _ret=$2
@@ -9,10 +14,13 @@ die()
   exit ${_ret}
 }
 _arg_port="9009"
+_arg_admin="admin@galaxy.org"
 print_help ()
 {
-  printf 'Usage: %s [-p|--port <arg>]\n' "$0"
+  printf 'Usage: %s [-p|--port <arg>] [-a|--admin <arg>] [-h|--help]\n' "$0"
   printf "\t%s\n" "-p,--port: port for toolshed listener (default: '"9009"')"
+  printf "\t%s\n" "-a,--admin: email for admin user, separate multiple emails with commas (default: '"admin@galaxy.org"')"
+  printf "\t%s\n" "-h,--help: Prints help"
 }
 parse_commandline ()
 {
@@ -30,6 +38,18 @@ parse_commandline ()
         ;;
       -p*)
         _arg_port="${_key##-p}"
+        ;;
+      -a|--admin)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_admin="$2"
+        shift
+        ;;
+      --admin=*)
+        _arg_admin="${_key##--admin=}"
+        ;;
+      -h|--help)
+        print_help
+        exit 0
         ;;
       *)
         _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
@@ -79,28 +99,26 @@ if [ ! -f $TOOLSHEDYML ]; then
   s/$/\
   static-map: \/static\/style=static\/style\/blue/
   }' $TOOLSHEDYML
+  grep 'static-map: static\/style=static' $TOOLSHEDYML || sed -i -e "/#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/" $TOOLSHEDYML
 fi
 
 echo "
   Now you will want to:
-    - Decide what email address you will want to register in the 
-      'localshed' tool shed.
-        e.g., john.doe@example.net
-    - Add that email address to $TOOLSHEDYML
-        e.g.,
-          admin_users: john.doe@example.net
-        ^^ Very important!  This line must begin with two spaces 
-        and appear below "tool_shed:"
+    - The email address(es) of the admin user(s) are defined 
+      in $TOOLSHEDYML as
+        $_arg_admin
     - Run the toolshed with the command
         /run_shed
     - Browse to the port forwarded to the toolshed.
       - Probably this would be http://localhost:8709
-      - Register as a user with the email address chosen previously.
+      - Register as a user with the email address
+          $_arg_admin
       - Add the shed category (or categories) appropriate for your tool
       - Navigate to 'User > API Keys' and generate an API key.
       - Copy the API key.
     - Replace the API key under 'localshed' in ~/.planemo.yml with 
-      the API key generated above.
+      the API key generated above, and make sure that the port for
+      the URL is set to $_arg_port.
 
   These changes will be persistent, so that the next time you run 
     /run_shed

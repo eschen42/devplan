@@ -3,9 +3,11 @@ PLANEMOPARMS="$*"
 usage ()
 {
   echo '
-  Usage: run_planemo_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
-  e.g.:  run_planemo_serve -t localshed    --port 8791
+  Usage: /run_planemo_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
+   e.g.: /run_planemo_serve -t localshed    --port 9090
+     or: /run_planemo_serve -t localshed
   Take the toolshed name from ~/.planemo.yml
+  If you do not supply the port argument, "planemo shed_serve" will listen on port 9090 by default.
   '
 }
 if [ $1_ == _ ]; then
@@ -24,21 +26,20 @@ fi
 echo GALAXYROOT=$GALAXYROOT
 
 TEMP_LOG_FILE=~/planemoshedserve.log
-nohup ( \
-  > "$TEMP_LOG_FILE" \
-  planemo shed_serve \
+planemo shed_serve \
   $PLANEMOPARMS \
   $GALAXYROOT \
   --host 0.0.0.0 \
   --conda_dependency_resolution \
   . \
-  &> "$TEMP_LOG_FILE" & \
-)
+  &> "$TEMP_LOG_FILE" & 
 LASTPID=$!
-
-echo 'planemo shed_serve' is running as $LASTPID
-echo When it is up it will be listening on 127.0.0.1:9090
-echo "To see the 'planemo shed_serve' log, 'tail -f \"$TEMP_LOG_FILE\"'"
-
+cat << .
+   'planemo shed_serve' is running as process ID $LASTPID
+     - When it is up it will be listening on port 9090 unless 
+       you invoked /run_planemo_serve with the --port argument.
+     - To see the 'planemo shed_serve' log:
+         tail -f $TEMP_LOG_FILE
+.
 # vim: ts=2 sw=2 et ai:
 

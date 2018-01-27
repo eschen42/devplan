@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# ARG_OPTIONAL_SINGLE([pid],[p],[pid of parent of process tree],[missing])
+# ARG_HELP([])
+
+die()
+{
+  local _ret=$2
+  test -n "$_ret" || _ret=1
+  test "$_PRINT_HELP" = yes && print_help >&2
+  echo "$1" >&2
+  exit ${_ret}
+}
+
+begins_with_short_option()
+{
+  local first_option all_short_options
+  all_short_options='ph'
+  first_option="${1:0:1}"
+  test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
+}
+
+
+
+# THE DEFAULTS INITIALIZATION - OPTIONALS
+_arg_pid="missing"
+
+print_help ()
+{
+  printf 'Usage: %s [-p|--pid <arg>] [-h|--help]\n' "$0"
+  printf "\t%s\n" "-p,--pid: pid of parent of process tree (default: '"missing"')"
+  printf "\t%s\n" "-h,--help: Prints help"
+}
+
+parse_commandline ()
+{
+  while test $# -gt 0
+  do
+    _key="$1"
+    case "$_key" in
+      -p|--pid)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_pid="$2"
+        shift
+        ;;
+      --pid=*)
+        _arg_pid="${_key##--pid=}"
+        ;;
+      -p*)
+        _arg_pid="${_key##-p}"
+        ;;
+      -h|--help)
+        print_help
+        exit 0
+        ;;
+      -h*)
+        print_help
+        exit 0
+        ;;
+      *)
+        _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+        ;;
+    esac
+    shift
+  done
+}
+
+parse_commandline "$@"
+
+
+if [ $_arg_pid != missing ]; then
+  kill -TERM -$( \
+    ps -a -o pid,pgid \
+    | sed -n -e "/^[ ]*$_arg_pid[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
+  )
+  exit $?
+else
+  print_help
+  exit 1
+fi

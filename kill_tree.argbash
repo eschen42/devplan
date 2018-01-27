@@ -1,0 +1,22 @@
+# m4_ignore( # message when argbash is needed
+echo "This is just a script template, not the script (yet) - pass it to 'argbash' to fix this." >&2
+echo "See https:/argbash.io"
+exit 11  #)Created by argbash-init v2.5.1
+#!/bin/bash
+
+# ARG_OPTIONAL_SINGLE([pid], [p], [pid of parent of process tree], [missing])
+# ARGBASH_SET_INDENT([  ])
+# ARG_HELP([])
+# ARGBASH_GO()
+# [ <-- needed because of Argbash
+if [ $_arg_pid != missing ]; then
+  kill -TERM -$( \
+    ps -a -o pid,pgid \
+    | sed -n -e "/^[ ]*$_arg_pid[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
+  )
+  exit $?
+else
+  print_help
+  exit 1
+fi
+# ] <-- needed because of Argbash

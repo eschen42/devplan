@@ -163,5 +163,7 @@ COPY run_shed /run_shed
 RUN  bash -c 'chmod +x /run_shed'
 COPY run_planemo_serve /run_planemo_serve
 RUN  bash -c 'chmod +x /run_planemo_serve'
+COPY kill_tree /kill_tree
+RUN  bash -c 'chmod +x /kill_tree'
 
 COPY Dockerfile /Dockerfile
