@@ -87,19 +87,25 @@ if [ -d galaxyproject-galaxy-* ]; then
 fi
 TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
 if [ ! -f $TOOLSHEDYML ]; then
-  # spacing here is critical - no extra spaces or tabs permitted
+  # Indentation here is critical - no extra spaces or tabs permitted
+  # Listen globally (0.0.0.0), not just in container (127.0.0.1) for connections to tool shed
   sed -e "s/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:$_arg_port/" $TOOLSHEDYML.sample > $TOOLSHEDYML
+  # Set if unset in tool_shed.yml - static-map: /static=static
   grep 'static-map: static=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
   # do not change indentation here - it is critical to YAML format
   s/$/\
   static-map: \/static=static/
   }' $TOOLSHEDYML
+  # Set if unset in tool_shed.yml - static-map: /static/style=static/style/blue
   grep 'static-map: static\/style=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
   # do not change indentation here - it is critical to YAML format
   s/$/\
   static-map: \/static\/style=static\/style\/blue/
   }' $TOOLSHEDYML
-  grep 'static-map: static\/style=static' $TOOLSHEDYML || sed -i -e "/#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/" $TOOLSHEDYML
+  # Set admin users as supplied if supplied
+  sed -i -e "/#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/" $TOOLSHEDYML
+  # Update ~/.planemo.yml to point to this Galaxy root by default
+  sed -i -e "s!#galaxy_root: /path/to/galaxy_root!$HOME/shed/galaxyproject-galaxy/!" ~/.planemo.yml
 fi
 
 echo "
@@ -110,7 +116,7 @@ echo "
     - Run the toolshed with the command
         /run_shed
     - Browse to the port forwarded to the toolshed.
-      - Probably this would be http://localhost:8709
+      - Ideally, this would be http://localhost:$_arg_port
       - Register as a user with the email address
           $_arg_admin
       - Add the shed category (or categories) appropriate for your tool
