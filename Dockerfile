@@ -65,15 +65,15 @@
 ##    ```
 ##
 ## ## Step 2 - Create a persistent home directory
-##    - Create a directory on the host to persist changes to /home/rstudio on the guest, e.g.:
+##    - Create a directory on the host to persist changes to `/home/rstudio` on the guest, e.g.:
 ##    ```
 ##        mkdir ~/rstudio
 ##    ```
-##    - Important: Files created within ~/rstudio will be owned by the owner of ~/rstudio (and have the same group as ~/rstudio).
-##      -  Make sure that you adjust ~/rstudio userid and groupid with `chown` *before* you perform step 3.
+##    - Important: Files created within `/home/rstudio` on the guest will be owned by the owner of (and have the same group as) this directory.
+##      -  Make sure that you adjust the userid and groupid of this directory with `chown` *before* you perform step 3.
 ##
 ## ## Step 3 - Run a new container instance from the image
-##    - Run the container with this new directory; note that the container will create files
+##    - Run the container with this directory; note that the container will create files
 ##      in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
 ##    ```
 ##        # docker run       - create a new docker container
@@ -91,6 +91,8 @@
 ##    ```
 ##    - At this point you can use RStudio; see Step 8 below.
 ##    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
+##    - After you exit the container, the next time you run this `docker run` command, `/home/rstudio` on the guest will have your files and history.
+##    - To experiment *without* persisting changes, omit the `-v ~/rstudio:/home/rstudio` option.
 ##
 ## ## Step 4 - Set up the rstudio home directory
 ##    - **Important:** *Perform this and all subsequent steps running as user `rstudio`.*
