@@ -76,7 +76,18 @@
 ##    - Run the container with this new directory; note that the container will create files
 ##      in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
 ##    ```
-##        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -p 8709:8709 -v ~/rstudio:/home/rstudio eschen42/devplan
+##        # docker run       - create a new docker container
+##        #   --name devplan -   nicknamed devplan
+##        #   --rm           -   automatic clean-up when container stops
+##        #   -ti            -   allow interaction with the keyboard
+##        #   -p 8787:8787   -   allow connection on localhost port 8787 to connect to Rstudio in the container 
+##        #   -p 8790:8790   -   allow connection on localhost port 8790 to planemo serve and planemo shed_serve
+##        #   -p 8709:8709   -   allow connection on localhost port 8709 to a local instance of Galaxy toolshed
+##        #   -v ~/rstudio:/home/rstudio
+##        #                  - share host folder ~/rstudio within the container as /home/rstudio
+##        #   eschen42/devplan (or docker pull eschen42/devplan:put-the-tag-here)
+##        #                  -   run this docker image
+##        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:8790 -p 8709:8709 -v ~/rstudio:/home/rstudio eschen42/devplan
 ##    ```
 ##    - At this point you can use RStudio; see Step 7 below.
 ##    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
