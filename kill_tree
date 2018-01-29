@@ -78,3 +78,4 @@ else
   print_help
   exit 1
 fi
+# vim: sw=2 ts=2 et ai :

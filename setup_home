@@ -83,6 +83,9 @@ if [ ! -f ~/.profile ]; then
     export PATH="/usr/local/bin:/usr/bin:/bin"
     eval `ssh-agent -s`
     echo "use ssh-add to add keys to the ssh-agent"
+
+    ROWCOL="$(stty -a | grep columns | sed -e 's/speed [0-9]* baud; rows \([0-9]*\); columns \([0-9]*\);.*/export LINES=\1; export COLUMNS=\2 /')"
+    $ROWCOL
   ' | sed -e 's/^    //' > ~/.profile
 fi
 
@@ -91,17 +94,13 @@ if [ ! -f ~/.bash_profile ]; then
   echo '
     . ~/.profile
     . ~/.bashrc
-  ' | sed -e 's/^    //' > ~/.bash_profile
-fi
-
-# - set up ~/.bash_logout
-if [ ! -f ~/.bash_logout ]; then
-  echo '
-    if [ "$SHLVL" = 1 ]; then
+    function bash_logout {
       echo killing ssh agent $SSH_AGENT_PID
       kill $SSH_AGENT_PID
-    fi
-  ' | sed -e 's/^    //' > ~/.bash_logout
+      echo "exiting login shell"
+    }
+    trap bash_logout EXIT
+  ' | sed -e 's/^    //' > ~/.bash_profile
 fi
 
 # - set up ~/.bashrc.d
@@ -228,3 +227,4 @@ if [ $HADVENV -eq 0 ]; then
       /setup_shed
   ' | sed -e 's/^    //'
 fi
+# vim: sw=2 ts=2 et ai :

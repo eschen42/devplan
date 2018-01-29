@@ -105,14 +105,15 @@ if [ ! -f $TOOLSHEDYML ]; then
   # Set admin users as supplied if supplied
   sed -i -e "/#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/" $TOOLSHEDYML
   # Update ~/.planemo.yml to point to this Galaxy root by default
-  sed -i -e "s!#galaxy_root: /path/to/galaxy_root!$HOME/shed/galaxyproject-galaxy/!" ~/.planemo.yml
+  sed -i -e "s?#galaxy_root: /path/to/galaxy_root?galaxy_root: $HOME/shed/galaxyproject-galaxy/?; s/127.0.0.1:9009/127.0.0.1:$_arg_port/" ~/.planemo.yml
 fi
 
 echo "
-  Now you will want to:
+  The shed is now set up.
     - The email address(es) of the admin user(s) are defined 
       in $TOOLSHEDYML as
         $_arg_admin
+  Now you will want to:
     - Run the toolshed with the command
         /run_shed
     - Browse to the port forwarded to the toolshed.

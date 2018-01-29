@@ -17,7 +17,7 @@ cat << .
          - either run:
              /kill_tree --pid $LASTPID
          - or, equivalently, run:
-            kill -TERM -$( \
+             kill -TERM -$( \
               ps -a -o pid,pgid \
               | sed -n -e "/^[ ]*$LASTPID[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
             )

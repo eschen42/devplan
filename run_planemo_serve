@@ -3,45 +3,38 @@ PLANEMOPARMS="$*"
 usage ()
 {
   echo '
-  Usage: /run_planemo_serve -t toolshedname [optional parameters to be passed through to "planemo shed_serve"]
-   e.g.: /run_planemo_serve -t localshed    --port 9090
-     or: /run_planemo_serve -t localshed
+  Usage: /run_planemo_serve [optional parameters to be passed through to "planemo serve"]
+   e.g.: /run_planemo_serve --port 9090
+     or: /run_planemo_serve 
   Take the toolshed name from ~/.planemo.yml
-  If you do not supply the port argument, "planemo shed_serve" will listen on port 9090 by default.
+  If you do not supply the port argument, "planemo serve" will listen on port 9090 by default.
   '
 }
-if [ $1_ == _ ]; then
-  usage
-  exit 1
-fi
 if [ $1_ == --help_ ]; then
   usage
   exit 0
 fi
-if [ -d ~/shed/galaxyproject-galaxy ]; then
-  GALAXYROOT="--galaxy_root $HOME/shed/galaxyproject-galaxy/"
-else
-  GALAXYROOT=
-fi
-echo GALAXYROOT=$GALAXYROOT
-
-TEMP_LOG_FILE=~/planemoshedserve.log
-planemo shed_serve \
+TEMP_LOG_FILE=~/planemoserve.log
+planemo serve \
   $PLANEMOPARMS \
-  $GALAXYROOT \
   --host 0.0.0.0 \
   --conda_dependency_resolution \
   . \
   &> "$TEMP_LOG_FILE" & 
 LASTPID=$!
 cat << .
-   'planemo shed_serve' is running as process ID $LASTPID
+   'planemo serve' is running as process ID $LASTPID
      - When it is up it will be listening on port 9090 unless 
        you invoked /run_planemo_serve with the --port argument.
-     - To see the 'planemo shed_serve' log:
-         tail -f $TEMP_LOG_FILE
-     - You can shut down 'planemo shed_serve' with the command:
-         kill -TERM $LASTPID
+     - To see the 'planemo serve' log:
+             tail -f $TEMP_LOG_FILE
+     - You can shut down 'planemo serve' with the command:
+             /kill_tree --pid $LASTPID
+         - or, equivalently, run:
+             kill -TERM -$( \
+               ps -a -o pid,pgid \
+               | sed -n -e "/^[ ]*$LASTPID[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
+             )
 .
 # vim: ts=2 sw=2 et ai:
 

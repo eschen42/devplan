@@ -76,7 +76,7 @@
 ##    - Run the container with this new directory; note that the container will create files
 ##      in this directory with UID 1000 (which is user rstudio on the guest), e.g.:
 ##    ```
-##        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -v ~/rstudio:/home/rstudio eschen42/devplan
+##        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:9090 -p 8709:8709 -v ~/rstudio:/home/rstudio eschen42/devplan
 ##    ```
 ##    - At this point you can use RStudio; see Step 7 below.
 ##    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
@@ -134,10 +134,14 @@
 ##
 ## ## Step 7 - Setting up the `localshed` tool shed
 ## You can set up a local instance of the Galaxy tool shed; this requires a moderate amount of manual effort:
-##   - To begin, run the command
+##   - To begin, run the command to set up the shed, along with a port for the web server "listener" and your email address, e.g.:
 ##        ```
-##             /setup_shed
+##             /setup_shed --port 8709 --admin admin@galaxy.org
 ##        ```
+##   - *Note well*: You will most likely want to access your tool shed through the browser as "localhost" on the same port as
+##     the tool shed server is listening to in the container.  At some point, you may want to install to an instance of Galaxy
+##     running in your container, using the administrative interface of the Galaxy web interface; because the tool shed and the
+##     web interact by passing the URL of the toolshed back and forth, you can avoid some "broken" URLs this way. 
 ##
 ## ## Step 8 - Running RStudio
 ##    - On the host, browse to RStudio at http://localhost:8787
@@ -150,7 +154,10 @@
 ##    - On the guest,
 ##      - `cd` to the directory with the source code for your Galaxy tool;
 ##      - run the `/run_planemo_serve` convenience script
-##        - or, run `planemo serve` with the parameters of your choice.
+##        - or, run `planemo serve` with the parameters of your choice, e.g.:
+##            ```
+##              planemo serve --port 8790 --host 0.0.0.0 --conda_dependency_resolution .
+##            ```
 ##    - On the host,
 ##      - browse to the `planemo serve` instance at http://localhost:8790
 ##
@@ -166,8 +173,19 @@
 ##      - make sure that you started the tool shed, as described in Step 10.
 ##        - Make note of the process ID in case you want to shut it down later.
 ##        - For instance, suppose it starts with PID 442.
+##      - make sure that you have added the category for your tool via the shed admin menu.
+##      - make sure that you have added the repository for at least one tool to the toolshed, e.g.:
+##          ```
+##              planemo shed_create -t localshed --name my_new_tool .
+##          ```
+##         - an empty tooshed causes an error with `planemo shed_serve`
 ##      - run `/run_planemo_shed_serve -t localshed`
-##        - or, run `planemo shed_serve` with the parameters of your choice.
+##        - or, run `planemo shed_serve` with the parameters of your choice, e.g.:
+##            ```
+##              planemo shed_serve -t localshed --port 8790 \
+##                --galaxy_root /home/rstudio/shed/galaxyproject-galaxy/ \
+##                --host 0.0.0.0 --conda_dependency_resolution .
+##            ```
 ##        - You will either have to make sure that `planemo serve` is not running
 ##          or run `planemo shed_serve` on a different port.
 ##    - On the host, browse to the `planemo shed_serve` instance at http://localhost:8790
@@ -184,7 +202,7 @@ RUN apt-get update
 # texlive-common includes both texlive-science and texlive-latex-extra
 RUN apt-get install -y texlive-common
 # Set up some utilities that I don't want to be without
-RUN apt-get -y install bzip2 curl wget vim-tiny
+RUN apt-get -y install bzip2 curl wget vim-tiny screen
 RUN update-alternatives --install /usr/bin/vim vim /usr/bin/vim.tiny 10
 RUN apt-get -y install net-tools bind9-host dnsutils
 RUN apt-get -y install locales gawk debconf git

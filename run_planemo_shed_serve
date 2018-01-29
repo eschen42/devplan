@@ -39,9 +39,14 @@ cat << .
      - When it is up it will be listening on port 9090 unless 
        you invoked /run_planemo_shed_serve with the --port argument.
      - To see the 'planemo shed_serve' log:
-         tail -f $TEMP_LOG_FILE
+             tail -f $TEMP_LOG_FILE
      - You can shut down 'planemo shed_serve' with the command:
-         kill -TERM $LASTPID
+             /kill_tree --pid $LASTPID
+         - or, equivalently, run:
+             kill -TERM -$( \
+               ps -a -o pid,pgid \
+               | sed -n -e "/^[ ]*$LASTPID[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
+             )
 .
 # vim: ts=2 sw=2 et ai:
 
