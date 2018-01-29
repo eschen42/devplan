@@ -54,39 +54,41 @@ if [ `which planemo`_ != ~/venv/bin/planemo_ ]; then
       again.  If that does not help, you may want to 
       'rm -rf ~/venv' and try running '/setup_home' again.
   "
-  exit 1
 fi
 
 # - Initialize conda from planemo
-if [ -d  ~/miniconda3/bin/conda ]; then
-  echo "
-    ~/miniconda3/bin/conda already exists, so I won't run planemo conda_init
-  "
-else
-  planemo conda_init
-  RESULT=$?
-  if [ $RESULT -ne 0 ]; then
-    rm -rf ~/miniconda3
+if [ `which planemo`_ != ~/venv/bin/planemo_ ]; then
+  if [  -d  ~/miniconda3/bin/conda ]; then
     echo "
-      Errors occurred while planemo was installing conda.
-      Please check your network connection, then try running '/setup_home' 
-        again.  If that does not help, you may want to 
-        'rm -rf ~/venv' and try running '/setup_home' again.
+      ~/miniconda3/bin/conda already exists, so I won't run planemo conda_init
     "
-    exit 1
+  else
+    planemo conda_init
+    RESULT=$?
+    if [ $RESULT -ne 0 ]; then
+      rm -rf ~/miniconda3
+      echo "
+        Errors occurred while planemo was installing conda.
+        Please check your network connection, then try running '/setup_home' 
+          again.  If that does not help, you may want to 
+          'rm -rf ~/venv' and try running '/setup_home' again.
+      "
+    fi
   fi
 fi
 
 # - set up ~/.profile
 if [ ! -f ~/.profile ]; then
-  echo '
-    export PATH="/usr/local/bin:/usr/bin:/bin"
-    eval `ssh-agent -s`
-    echo "use ssh-add to add keys to the ssh-agent"
 
-    ROWCOL="$(stty -a | grep columns | sed -e 's/speed [0-9]* baud; rows \([0-9]*\); columns \([0-9]*\);.*/export LINES=\1; export COLUMNS=\2 /')"
-    $ROWCOL
-  ' | sed -e 's/^    //' > ~/.profile
+  echo "
+    export PATH='/usr/local/bin:/usr/bin:/bin'
+    eval `ssh-agent -s`
+    echo 'use ssh-add to add keys to the ssh-agent'
+
+    stty -a | head -n 1
+    ROWCOL=\"\$(stty -a | head -n 1 | grep columns | sed -n -e 's/speed [0-9]* baud; rows \([0-9]*\); columns \([0-9]*\);.*/export LINES=\1; export COLUMNS=\2 /; s/.*speed//; p')\"
+    \$ROWCOL
+  " | sed -e 's/^    //' > ~/.profile
 fi
 
 # - set up ~/.bash_profile
@@ -225,6 +227,8 @@ if [ $HADVENV -eq 0 ]; then
 
     If you want to run a toolshed, run
       /setup_shed
+    as follows:
   ' | sed -e 's/^    //'
+  /setup_shed --help | sed -e 's/^/  /'
 fi
 # vim: sw=2 ts=2 et ai :

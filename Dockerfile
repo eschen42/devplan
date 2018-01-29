@@ -64,8 +64,8 @@
 ##        docker build -t eschen42/devplan .
 ##    ```
 ##
-## ## Step 2 - Create home directory on the host
-##    - Create a home directory, e.g.:
+## ## Step 2 - Create a persistent home directory
+##    - Create a directory on the host to persist changes to /home/rstudio on the guest, e.g.:
 ##    ```
 ##        mkdir ~/rstudio
 ##    ```
