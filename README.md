@@ -89,7 +89,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        #                  -   run this docker image
        docker run --name devplan --rm -ti -p 8787:8787 -p 8790:8790 -p 8709:8709 -v ~/rstudio:/home/rstudio eschen42/devplan
    ```
-   - At this point you can use RStudio; see Step 7 below.
+   - At this point you can use RStudio; see Step 8 below.
    - In fact, you can use the terminal interface within Rstudio (`Tools > Terminal > New Terminal`) to complete the following steps.
 
 ## Step 4 - Set up the rstudio home directory
