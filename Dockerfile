@@ -204,6 +204,29 @@
 ##    - On the host, browse to the `planemo shed_serve` instance at http://localhost:8790
 ##      - For the example above, run `kill -TERM 442`
 ##
+## # Customization
+##
+## If you prefer `emacs` as your editor, you will want to:
+##   - modify or extend the Dockerfile to install the desired emacs packages
+##   - append the something like following to `/home/rstudio/profile` in the guest or modify `setup_home` accordingly:
+##     ```
+##        # this is not validated becasue I don't use emacs
+##        EDITOR=emacs; export EDITOR
+##        # turn off vi-mode command-line editing-behavior
+##        set +o vi
+##        # turn on emacs-mode command-line editing-behavior
+##        set -o emacs
+##     ```
+##
+## If you prefer `nano` as your editor, you will want to:
+##   - modify or extend the Dockerfile to install the desired nano packages
+##   - append the something like following to `/home/rstudio/profile` in the guest or modify `setup_home` accordingly:
+##     ```
+##        # this is not validated becasue I don't use nano
+##        EDITOR=nano; export EDITOR
+##        # turn off vi-mode command-line editing-behavior
+##        set +o vi
+##     ```
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' Dockerfile`
 
