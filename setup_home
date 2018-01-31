@@ -82,7 +82,7 @@ if [ ! -f ~/.profile ]; then
 
   echo "
     export PATH='/usr/local/bin:/usr/bin:/bin'
-    eval `ssh-agent -s`
+    eval \`ssh-agent -s\`
     echo 'use ssh-add to add keys to the ssh-agent'
 
     stty -a | head -n 1
