@@ -259,9 +259,11 @@ RUN sed -i -e '/rstudio:$/ s/:$/:\/bin\/bash/' /etc/passwd
 RUN apt-get -y install man-db manpages manpages-dev
 
 # In rocker/verse, /init starts up s6 services.
-#   Append to /init to log in the rstudio user after starting the s6 services.
-RUN  bash -c 'mv /init /init3'
-RUN  bash -c 'echo "su - rstudio" >> /init3'
+#   Override this by moving /init out of the way.
+# /init calls /init2 then /init3
+RUN  bash -c 'mv /init /init.old'
+COPY init3 /init3
+RUN  bash -c 'chmod +x /init3'
 COPY init /init
 RUN  bash -c 'chmod +x /init'
 COPY init2 /init2

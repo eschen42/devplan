@@ -1,0 +1,45 @@
+# On host http://w4m.cfans.umn.edu, perform these two steps:
+#   mkdir ~/scratch10
+#   docker run --name devplan --rm -d -p 9887:8787 -p 9890:8790 -p 9891:8791 -p 9809:9809 -v ~/scratch10:/home/rstudio devplan
+
+# Browse to http://w4m.cfans.umn.edu:9887
+# Log in as rstudio/rstudio
+# Open a terminal with "Tools > Terminal > New Terminal", whic opens a bash prompt
+# Change the password for rstudio
+passwd
+# Set up the home directory and bash profile, etc.
+/setup_home
+# Load the setup with this
+. ~/.bash_profile
+# or do 'bash -l'
+
+# Set up the localshed tool shed
+setup_shed --help
+/setup_shed -p 9809 -a demouser@example.net -u http://w4m.cfans.umn.edu -s demouser
+# Run the localshed tool shed listening on port 9809
+/run_shed
+
+# Browse to http://w4m.cfans.umn.edu:9809
+# Register (User > Register) as user 'demouser@example.net' with username 'demouser'
+# Add one or more categories that you will be using for
+#    your tools (you can go back to add this or others later)
+#    (Admin > Categories > Add new category)
+# Generate an API key (user > API keys > Generate a new key now)
+# Paste API key into ~/.planemo.yml > sheds > localshed > key)
+vim ~/.planemo.yml
+
+# Get a wrapper and cd to its root directory
+mkdir ~/src
+cd ~src
+git clone https://github.com/HegemanLab/w4mclassfilter_galaxy_wrapper.git
+cd w4mclassfilter_galaxy_wrapper/
+
+# Run planemo_serve, test with live-edits
+/run_planemo_serve --help
+/run_planemo_serve --port 8791
+# browse to 'planemo serve', test wrapper (and fix if needed)
+
+# Deploy tool to the localshed
+planemo shed_create -t localshed --owner demouser .
+# validate that tool can be installed from toolshed into Galaxy
+/run_planemo_shed_serve -t localshed --port 8790 --owner demouser

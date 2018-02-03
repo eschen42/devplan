@@ -13,21 +13,52 @@ die()
   echo "$1" >&2
   exit ${_ret}
 }
-_arg_port="9009"
-_arg_admin="admin@galaxy.org"
 print_help ()
 {
   printf 'Usage: %s [-p|--port <arg>] [-a|--admin <arg>] [-h|--help]\n' "$0"
-  printf "\t%s\n" "-p,--port: port for toolshed listener (default: '"9009"')"
-  printf "\t%s\n" "-a,--admin: email for admin user, separate multiple emails with commas (default: '"admin@galaxy.org"')"
+  printf "\t%s\n" "-p,--port: port for toolshed listener (default: '9009')"
+  printf "\t%s\n" "-a,--admin: email for admin user, separate multiple emails with commas (default: 'admin@galaxy.org')"
+  printf "\t%s\n" "-s,--sheduser: username for toolshed (no default!)"
+  printf "\t%s\n" "-u,--url: URL for toolshed listener, without port (default: 'http://localhost')"
   printf "\t%s\n" "-h,--help: Prints help"
 }
+_arg_url="http://localhost"
+_arg_port="9009"
+_arg_admin="admin@galaxy.org"
+_arg_sheduser_default="no_default"
+_arg_sheduser=$_arg_sheduser_default
+_secret=`python -c 'import time; print time.time()' | md5sum | cut -f 1 -d ' '`
 parse_commandline ()
 {
   while test $# -gt 0
   do
     _key="$1"
     case "$_key" in
+      # SHEDUSER
+      -s|--sheduser)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_sheduser="$2"
+        shift
+        ;;
+      --sheduser=*)
+        _arg_sheduser="${_key##--sheduser=}"
+        ;;
+      -s*)
+        _arg_sheduser="${_key##-s}"
+        ;;
+      # URL
+      -u|--url)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_url="$2"
+        shift
+        ;;
+      --url=*)
+        _arg_url="${_key##--url=}"
+        ;;
+      -u*)
+        _arg_url="${_key##-u}"
+        ;;
+      # PORT
       -p|--port)
         test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
         _arg_port="$2"
@@ -39,6 +70,7 @@ parse_commandline ()
       -p*)
         _arg_port="${_key##-p}"
         ;;
+      # ADMIN
       -a|--admin)
         test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
         _arg_admin="$2"
@@ -47,18 +79,26 @@ parse_commandline ()
       --admin=*)
         _arg_admin="${_key##--admin=}"
         ;;
+      # HELP
       -h|--help)
         print_help
         exit 0
         ;;
       *)
-        _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+        _PRINT_HELP=yes
+        die "FATAL ERROR: Got an unexpected argument '$1'" 1
         ;;
     esac
     shift
   done
 }
 parse_commandline "$@"
+
+if [ "$_arg_sheduser" == "$_arg_sheduser_default" ]; then
+  echo missing mandatory argument --sheduser
+  print_help
+  exit 1
+fi
 
 ### set up toolshed
 if [ ! -d ~/shed ]; then
@@ -86,6 +126,7 @@ if [ -d galaxyproject-galaxy-* ]; then
   mv galaxyproject-galaxy-* galaxyproject-galaxy
 fi
 TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
+PLANEMOYML=~/.planemo.yml
 if [ ! -f $TOOLSHEDYML ]; then
   # Indentation here is critical - no extra spaces or tabs permitted
   # Listen globally (0.0.0.0), not just in container (127.0.0.1) for connections to tool shed
@@ -103,9 +144,18 @@ if [ ! -f $TOOLSHEDYML ]; then
   static-map: \/static\/style=static\/style\/blue/
   }' $TOOLSHEDYML
   # Set admin users as supplied if supplied
-  sed -i -e "/#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/" $TOOLSHEDYML
-  # Update ~/.planemo.yml to point to this Galaxy root by default
-  sed -i -e "s?#galaxy_root: /path/to/galaxy_root?galaxy_root: $HOME/shed/galaxyproject-galaxy/?; s/127.0.0.1:9009/127.0.0.1:$_arg_port/" ~/.planemo.yml
+  sed -i -e "
+    s/#id_secret: .*/id_secret: $_secret/;
+    /#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/
+  " $TOOLSHEDYML
+  # Update ~/.planemo.yml to point localshed to this toolshed
+  sed -i -e "/^  localshed:\$/,/^  [a-zA-Z]/ {
+    s?url: .*?url: \"$_arg_url:$_arg_port/\"?
+  }" $PLANEMOYML
+  #shed_username: "demouser"
+  sed -i -e "
+    s/^shed_username.*/shed_username: \"$_arg_sheduser\"/
+  " $PLANEMOYML
 fi
 
 echo "
