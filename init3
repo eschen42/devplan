@@ -1,0 +1,3 @@
+#!/bin/bash
+echo running rstudio-server - press control-C to abort
+su -l -c "/usr/lib/rstudio-server/bin/rstudio-server start" rstudio
