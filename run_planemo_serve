@@ -14,13 +14,16 @@ if [ $1_ == --help_ ]; then
   usage
   exit 0
 fi
+PLANEMO_SERVE="
+planemo serve
+  $PLANEMOPARMS
+  --host 0.0.0.0
+  --conda_dependency_resolution
+  .
+"
 TEMP_LOG_FILE=~/planemoserve.log
-planemo serve \
-  $PLANEMOPARMS \
-  --host 0.0.0.0 \
-  --conda_dependency_resolution \
-  . \
-  &> "$TEMP_LOG_FILE" & 
+echo $PLANEMO_SERVE
+$PLANEMO_SERVE &> "$TEMP_LOG_FILE" & 
 LASTPID=$!
 cat << .
    'planemo serve' is running as process ID $LASTPID

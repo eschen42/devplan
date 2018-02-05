@@ -25,13 +25,17 @@ else
 fi
 echo GALAXYROOT=$GALAXYROOT
 
+PLANEMO_SHED_SERVE="
+planemo shed_serve
+  $PLANEMOPARMS
+  $GALAXYROOT
+  --host 0.0.0.0
+  --conda_dependency_resolution
+  .
+"
 TEMP_LOG_FILE=~/planemoshedserve.log
-planemo shed_serve \
-  $PLANEMOPARMS \
-  $GALAXYROOT \
-  --host 0.0.0.0 \
-  --conda_dependency_resolution \
-  . \
+echo $PLANEMO_SHED_SERVE
+$PLANEMO_SHED_SERVE &> "$TEMP_LOG_FILE" & 
   &> "$TEMP_LOG_FILE" & 
 LASTPID=$!
 cat << .
