@@ -45,7 +45,7 @@ cat << .
      - To see the 'planemo shed_serve' log:
              tail -f $TEMP_LOG_FILE
      - You can shut down 'planemo shed_serve' with the command:
-             /kill_tree --pid $LASTPID
+             /kill_group --pid $LASTPID
          - or, equivalently, run:
              kill -TERM -$( \
                ps -a -o pid,pgid \

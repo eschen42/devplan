@@ -178,8 +178,8 @@
 ##    - On the guest, execute `/run_shed` and make note of the process ID in case you will need to shut down the tool shed.
 ##      - For instance, suppose it starts with PID 243.
 ##    - On the host, browse to http://localhost:8709
-##    - To shut down the tool shed, on the guest, execute `/kill_tree`
-##      - For the example above, run `/kill_tree --pid 243`
+##    - To shut down the tool shed, on the guest, execute `/kill_group`
+##      - For the example above, run `/kill_group --pid 243`
 ##
 ## ## Step 11 - Browsing results for `planemo shed_serve`
 ##    - On the guest,
@@ -259,26 +259,28 @@ RUN sed -i -e '/rstudio:$/ s/:$/:\/bin\/bash/' /etc/passwd
 RUN apt-get -y install man-db manpages manpages-dev
 
 # In rocker/verse, /init starts up s6 services.
-#   Override this by moving /init out of the way.
-# /init calls /init2 then /init3
-RUN  bash -c 'mv /init /init.old'
-COPY init3 /init3
-RUN  bash -c 'chmod +x /init3'
-COPY init /init
-RUN  bash -c 'chmod +x /init'
-COPY init2 /init2
-RUN  bash -c 'chmod +x /init2'
+# Define the fixid1 "service" that runs once, changing UID and GID of 'rstudio' user to match those of /home/rstudio
+RUN  mkdir /etc/services.d/fixid1k
+COPY fixid1k_run /etc/services.d/fixid1k/run
+# Copy the script to set up the home directory
+RUN  chmod u+x /etc/services.d/fixid1k/run
 COPY setup_home /setup_home
 RUN  bash -c 'chmod +x /setup_home'
+# Copy the script to set up the localshed local tool shed
 COPY setup_shed /setup_shed
 RUN  bash -c 'chmod +x /setup_shed'
+# Copy the script to run the localshed local tool shed
 COPY run_shed /run_shed
 RUN  bash -c 'chmod +x /run_shed'
+# Copy the script to run planemo shed_serve
 COPY run_planemo_shed_serve /run_planemo_shed_serve
 RUN  bash -c 'chmod +x /run_planemo_shed_serve'
+# Copy the script to run planemo serve
 COPY run_planemo_serve /run_planemo_serve
 RUN  bash -c 'chmod +x /run_planemo_serve'
-COPY kill_tree /kill_tree
-RUN  bash -c 'chmod +x /kill_tree'
+# Copy the script to kill all members of a process group
+COPY kill_group /kill_group
+RUN  bash -c 'chmod +x /kill_group'
 
 COPY Dockerfile /Dockerfile
+# vim: sw=2 ts=2 et

@@ -1,6 +1,0 @@
-#!/bin/bash
-/init2
-trap "echo 'devplan /init caught SIGHUP' 1>&2" SIGHUP
-trap "echo 'devplan /init caught SIGQUIT' 1>&2" SIGQUIT
-trap "echo 'Goodbye' 1>&2" EXIT
-/init3

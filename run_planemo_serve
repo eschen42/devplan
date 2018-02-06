@@ -32,7 +32,7 @@ cat << .
      - To see the 'planemo serve' log:
              tail -f $TEMP_LOG_FILE
      - You can shut down 'planemo serve' with the command:
-             /kill_tree --pid $LASTPID
+             /kill_group --pid $LASTPID
          - or, equivalently, run:
              kill -TERM -$( \
                ps -a -o pid,pgid \

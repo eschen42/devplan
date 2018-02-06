@@ -1,7 +1,9 @@
 #!/bin/bash
 ### set up toolshed
 if [ ! -d ~/shed ]; then
-  /setup_shed
+  echo "Please run '/setup_shed' before running '/run_shed'"
+  /setup_shed --help
+  exit 1
 fi
 TEMP_LOG_FILE=~/toolshed.log
 > "$TEMP_LOG_FILE"
@@ -15,7 +17,7 @@ cat << .
          tail -f $TEMP_LOG_FILE
      - Killing the toolshed process tree
          - either run:
-             /kill_tree --pid $LASTPID
+             /kill_group --pid $LASTPID
          - or, equivalently, run:
              kill -TERM -$( \
               ps -a -o pid,pgid \
