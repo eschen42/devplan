@@ -150,7 +150,7 @@ fi
 TOOLSHEDYML=$_arg_shedroot/galaxyproject-galaxy/config/tool_shed.yml
 PLANEMOYML=~/.planemo.yml
 if [ ! -f $TOOLSHEDYML ]; then
-  TOOLSHEDYMLSRC=$_arg_shedroot/galaxyproject-galaxy/config/tool_shed.yml.example
+  TOOLSHEDYMLSRC=$_arg_shedroot/galaxyproject-galaxy/config/tool_shed.yml.sample
 else
   cp $TOOLSHEDYML $TOOLSHEDYML.old
   TOOLSHEDYMLSRC=$TOOLSHEDYML.old
