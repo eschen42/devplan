@@ -20,8 +20,10 @@ print_help ()
   printf "\t%s\n" "-a,--admin: email for admin user, separate multiple emails with commas (default: 'admin@galaxy.org')"
   printf "\t%s\n" "-s,--sheduser: username for toolshed (no default!)"
   printf "\t%s\n" "-u,--url: URL for toolshed listener, without port (default: 'http://localhost')"
+  printf "\t%s\n" "-r,--shedroot: Path at which to create the tool shed (default: '~/shed')"
   printf "\t%s\n" "-h,--help: Prints help"
 }
+_arg_shedroot="~/shed"
 _arg_url="http://localhost"
 _arg_port="9009"
 _arg_admin="admin@galaxy.org"
@@ -45,6 +47,18 @@ parse_commandline ()
         ;;
       -s*)
         _arg_sheduser="${_key##-s}"
+        ;;
+      # ROOT
+      -r|--shedroot)
+        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        _arg_shedroot="$2"
+        shift
+        ;;
+      --shedroot=*)
+        _arg_shedroot="${_key##--shedroot=}"
+        ;;
+      -r*)
+        _arg_shedroot="${_key##-r}"
         ;;
       # URL
       -u|--url)
@@ -93,6 +107,8 @@ parse_commandline ()
   done
 }
 parse_commandline "$@"
+# remove quotes if any from _arg_shedroot to complete expansion of tilde
+_arg_shedroot=`echo $_arg_shedroot |  sed -e "s#[~]#$HOME#"`
 
 if [ "$_arg_sheduser" == "$_arg_sheduser_default" ]; then
   echo missing mandatory argument --sheduser
@@ -101,36 +117,50 @@ if [ "$_arg_sheduser" == "$_arg_sheduser_default" ]; then
 fi
 
 ### set up toolshed
-if [ ! -d ~/shed ]; then
-  mkdir ~/shed
+if [ -d $_arg_shedroot ]; then
+  cd $_arg_shedroot
+else
+  mkdir $_arg_shedroot
+  cd $_arg_shedroot
+  TARBALLURL=$( curl --silent https://api.github.com/repos/galaxyproject/galaxy/tags | grep tarball_url | head -n 1 | sed -e 's/.*https:/https:/; s/".*$//;' )
+  EXPECTED=$( echo $TARBALLURL | sed -e 's/.*[/]//' )
+  if [ -f $EXPECTED ]; then
+    rm $EXPECTED
+  fi
+  if [ ! -f $EXPECTED.tgz ]; then
+    echo downloading tarball: $TARBALLURL
+    echo '
+      Setting up a new toolshed.
+      This involves both downloading files of significant size
+      and significant computation subsequently.
+      Please be patient.  Thank you.
+    '
+    wget $TARBALLURL
+    mv $EXPECTED $EXPECTED.tgz
+    tar xzf $EXPECTED.tgz
+    if [ -d galaxyproject-galaxy-* ]; then
+      mv galaxyproject-galaxy-* galaxyproject-galaxy
+    fi
+  fi
 fi
-cd ~/shed
-TARBALLURL=$( curl --silent https://api.github.com/repos/galaxyproject/galaxy/tags | grep tarball_url | head -n 1 | sed -e 's/.*https:/https:/; s/".*$//;' )
-EXPECTED=$( echo $TARBALLURL | sed -e 's/.*[/]//' )
-if [ -f $EXPECTED ]; then
-  rm $EXPECTED
+if [ ! -d galaxyproject-galaxy ]; then
+  echo Error - cannot find toolshed files expected at `pwd`/galaxyproject-galaxy - aborting
+  exit 1
 fi
-if [ ! -f $EXPECTED.tgz ]; then
-  echo downloading tarball: $TARBALLURL
-  echo '
-    Setting up a new toolshed.
-    This involves both downloading files of significant size
-    and significant computation subsequently.
-    Please be patient.  Thank you.
-  '
-  wget $TARBALLURL
-  mv $EXPECTED $EXPECTED.tgz
-  tar xzf $EXPECTED.tgz
-fi
-if [ -d galaxyproject-galaxy-* ]; then
-  mv galaxyproject-galaxy-* galaxyproject-galaxy
-fi
-TOOLSHEDYML=~/shed/galaxyproject-galaxy/config/tool_shed.yml
+TOOLSHEDYML=$_arg_shedroot/galaxyproject-galaxy/config/tool_shed.yml
 PLANEMOYML=~/.planemo.yml
 if [ ! -f $TOOLSHEDYML ]; then
-  # Indentation here is critical - no extra spaces or tabs permitted
-  # Listen globally (0.0.0.0), not just in container (127.0.0.1) for connections to tool shed
-  sed -e "s/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:$_arg_port/" $TOOLSHEDYML.sample > $TOOLSHEDYML
+  TOOLSHEDYMLSRC=$_arg_shedroot/galaxyproject-galaxy/config/tool_shed.yml.example
+else
+  cp $TOOLSHEDYML $TOOLSHEDYML.old
+  TOOLSHEDYMLSRC=$TOOLSHEDYML.old
+fi  
+
+
+# Indentation here is critical - no extra spaces or tabs permitted
+# Listen globally (0.0.0.0), not just in container (127.0.0.1) for connections to tool shed
+sed -e "s/http: 127.0.0.1:\([0-9]*\)/http: 0.0.0.0:$_arg_port/" $TOOLSHEDYMLSRC > $TOOLSHEDYML
+if [ $TOOLSHEDYMLSRC != $TOOLSHEDYML.old ]; then
   # Set if unset in tool_shed.yml - static-map: /static=static
   grep 'static-map: static=static' $TOOLSHEDYML || sed -i -e '/uwsgi:/ {
   # do not change indentation here - it is critical to YAML format
@@ -143,20 +173,37 @@ if [ ! -f $TOOLSHEDYML ]; then
   s/$/\
   static-map: \/static\/style=static\/style\/blue/
   }' $TOOLSHEDYML
-  # Set admin users as supplied if supplied
-  sed -i -e "
-    s/#id_secret: .*/id_secret: $_secret/;
-    /#admin_users: None/ s/#admin_users: None/admin_users: $_arg_admin/
-  " $TOOLSHEDYML
-  # Update ~/.planemo.yml to point localshed to this toolshed
-  sed -i -e "/^  localshed:\$/,/^  [a-zA-Z]/ {
-    s?url: .*?url: \"$_arg_url:$_arg_port/\"?
-  }" $PLANEMOYML
-  #shed_username: "demouser"
-  sed -i -e "
-    s/^shed_username.*/shed_username: \"$_arg_sheduser\"/
-  " $PLANEMOYML
 fi
+
+# Set admin users as supplied if supplied
+sed -i -e "
+  s/#id_secret: .*/id_secret: $_secret/;
+  /#admin_users:/ s/#admin_users/admin_users/
+  /admin_users: .*/ s/admin_users: .*/admin_users: $_arg_admin/
+" $TOOLSHEDYML
+
+# Update ~/.planemo.yml to point localshed to this toolshed
+sed -i -e "/^  localshed:\$/,/^  [a-zA-Z]/ {
+  s?url: .*?url: \"$_arg_url:$_arg_port/\"?
+}" $PLANEMOYML
+
+#shed_username: "demouser"
+sed -i -e "
+  s/^shed_username.*/shed_username: \"$_arg_sheduser\"/
+" $PLANEMOYML
+
+
+
+
+
+
+
+sed -i -e "
+  s#SHED_ROOT=.*#SHED_ROOT='$_arg_shedroot'#
+  s/SHED_PORT=.*/SHED_PORT='$_arg_port'/
+  s/SHED_USERNAME=.*/SHED_USERNAME='$_arg_sheduser'/
+  s/SHED_USEREMAIL=.*/SHED_USEREMAIL='$_arg_admin'/
+" ~/.bashrc.d/rstudio
 
 echo "
   The shed is now set up.

@@ -40,8 +40,8 @@ $PLANEMO_SHED_SERVE &> "$TEMP_LOG_FILE" &
 LASTPID=$!
 cat << .
    'planemo shed_serve' is running as process ID $LASTPID
-     - When it is up it will be listening on port 9090 unless 
-       you invoked /run_planemo_shed_serve with the --port argument.
+     - When it is up it should be listening on port ${PLANEMO_SHED_SERVE_PORT:-9090}
+       unless you invoked /run_planemo_shed_serve with the --port argument.
      - To see the 'planemo shed_serve' log:
              tail -f $TEMP_LOG_FILE
      - You can shut down 'planemo shed_serve' with the command:

@@ -21,7 +21,11 @@
 
 # SHED_ROOT - directory for installing the 'localshed' toolshed (must not exist)
 SHED_ROOT=${SHED_ROOT:-~/shed}
-
+if [ -d $SHED_ROOT ]; then
+  echo Directory $SHED_ROOT exists.
+  echo Please either delete it or set the SHED_ROOT environment variable to point elsewhere.
+  exit 1
+fi
 
 # SHED_URL - URL for the 'localshed' toolshed
 #   - Try to ensure that this URL will resolve in both the container and in a user's web browser
@@ -57,10 +61,11 @@ echo "
   export SHED_URL=${SHED_URL}
   export SHED_USERNAME=${SHED_USERNAME}
   export SHED_USEREMAIL=${SHED_USEREMAIL}
+  export SHED_ROOT=${SHED_ROOT}
   cat /home/rstudio/.bashrc.d/rstudio | grep -v bashrc 1>&2
 " > ~/.bashrc.d/rstudio
 
 # set up a local tool shed
-/setup_shed -p ${SHED_PORT} -a ${SHED_USEREMAIL} -s ${SHED_USERNAME}
+/setup_shed -r ${SHED_ROOT} -p ${SHED_PORT} -a ${SHED_USEREMAIL} -s ${SHED_USERNAME}
 
 # vim: sw=2 ts=2 et :
