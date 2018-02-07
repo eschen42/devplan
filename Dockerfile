@@ -262,13 +262,16 @@ RUN apt-get -y install man-db manpages manpages-dev
 # Define the fixid1 "service" that runs once, changing UID and GID of 'rstudio' user to match those of /home/rstudio
 RUN  mkdir /etc/services.d/fixid1k
 COPY fixid1k_run /etc/services.d/fixid1k/run
-# Copy the script to set up the home directory
 RUN  chmod u+x /etc/services.d/fixid1k/run
+# Copy the script to set up the home directory
 COPY setup_home /setup_home
 RUN  bash -c 'chmod +x /setup_home'
 # Copy the script to set up the localshed local tool shed
 COPY setup_shed /setup_shed
 RUN  bash -c 'chmod +x /setup_shed'
+# Copy the script to invoke the previous two
+COPY setup_homeshed /setup_homeshed
+RUN  bash -c 'chmod +x /setup_homeshed'
 # Copy the script to run the localshed local tool shed
 COPY run_shed /run_shed
 RUN  bash -c 'chmod +x /run_shed'

@@ -178,8 +178,8 @@ You can set up a local instance of the Galaxy tool shed; this requires a moderat
    - On the guest, execute `/run_shed` and make note of the process ID in case you will need to shut down the tool shed.
      - For instance, suppose it starts with PID 243.
    - On the host, browse to http://localhost:8709
-   - To shut down the tool shed, on the guest, execute `/kill_tree`
-     - For the example above, run `/kill_tree --pid 243`
+   - To shut down the tool shed, on the guest, execute `/kill_group`
+     - For the example above, run `/kill_group --pid 243`
 
 ## Step 11 - Browsing results for `planemo shed_serve`
    - On the guest,

@@ -134,6 +134,9 @@ if [ ! -d ~/.bashrc.d ]; then
 
     # show a treelist of processes including PID and command line
     alias pstree="pstree -a -p"
+
+    # show a ruler for 200 columns
+    alias ruler="echo {0,1,2,3,4,5,6,7,8,9}----+--- {0,1,2,3,4,5,6,7,8,9}----+---"
   ' | sed -e 's/^    //' >> ~/.bashrc.d/alias
 fi
 
