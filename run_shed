@@ -5,14 +5,13 @@ if [ ! -d ~/shed ]; then
   /setup_shed --help
   exit 1
 fi
-TEMP_LOG_FILE=~/toolshed.log
-> "$TEMP_LOG_FILE"
-nohup ~/shed/galaxyproject-galaxy/run_tool_shed.sh &> "$TEMP_LOG_FILE" & 
-LASTPID=$!
+TEMP_LOG_FILE=~/toolshed
+#nohup ~/shed/galaxyproject-galaxy/run_tool_shed.sh &> "$TEMP_LOG_FILE" & 
+$SHED_ROOT/galaxyproject-galaxy/run_tool_shed.sh --daemonize $TEMP_LOG_FILE.log --pidfile $TEMP_LOG_FILE.pid
+LASTPID=`cat $TEMP_LOG_FILE.pid`
 cat << .
    Your toolshed is running as process ID $LASTPID
-     - When it is up it will be listening on port 9009 unless 
-       you invoked /setup_shed with the --port argument.
+     - When it is up it shoud be listening on port ${SHED_PORT:-9009}
      - To see the toolshed log:
          tail -f $TEMP_LOG_FILE
      - Killing the toolshed process tree
@@ -20,7 +19,7 @@ cat << .
              /kill_group --pid $LASTPID
          - or, equivalently, run:
              kill -TERM -$( \
-              ps -a -o pid,pgid \
+              ps -e -o pid,pgid \
               | sed -n -e "/^[ ]*$LASTPID[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
             )
 .

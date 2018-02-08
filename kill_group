@@ -70,7 +70,7 @@ parse_commandline "$@"
 
 if [ $_arg_pid != missing ]; then
   kill -TERM -$( \
-    ps -a -o pid,pgid \
+    ps -e -o pid,pgid \
     | sed -n -e "/^[ ]*$_arg_pid[ ]/ { s/.* \([0-9][0-9]*\)[ ]*$/\1/; p; }" \
   )
   exit $?
