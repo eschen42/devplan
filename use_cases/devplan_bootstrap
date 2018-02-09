@@ -1,0 +1,147 @@
+#!/bin/bash
+##
+## # Use cases for container setup
+##
+## You can automate the set-up of the Docker container on the Docker host by running the devplan_bootstrap script.
+## You probably don't want to run the script as root.
+##
+## Set some environment variables (preferably in a file), and then invoke the script.  For example:
+## ```
+## . global_server_enviroment
+## path/to/devplan_bootstrap
+## ```
+##
+## Here are the environment variables used by the script:
+## - PASSWORD - password for rstudio-server for user 'rstudio' (required)
+## - IMAGE - The name of the desired Docker image (default: eschen42/devplan:alpha),
+##   - local image-name (try 'docker images')
+##   - published image-name (search at https://hub.docker.com/r/eschen42/devplan/tags/)
+## - CONTAINER - the name of the container to be running the image (default: rstudio)
+## - DOCKER - command to run docker (default: docker)
+##    - If you aren't in the group docker, set DOCKER="sudo docker"
+## - HOMEDIR - path to host folder; if it does not exist it will be created
+## - HOSTINTERFACE - interface where listeners will listen (default: 127.0.0.1)
+##   - 0.0.0.0 will listen to connections from anywhere (security risk)
+##   - 127.0.0.1 will listen to connection requests only from the local machine
+## - PREFIX - all but the last two digits of the port numbers on which listeners will listen (default:88)
+## - SHED_USERNAME - ID for user in the 'localshed' toolshed (default: demouser)
+## - SHED_USEREMAIL - email for user in the 'localshed' toolshed (default: demouser@example.net)
+## - SHED_URL - URL for the 'localshed' toolshed (default: http://localhost)
+##   - Try to ensure that this URL will resolve in both the container and in a user's web browser
+## - SHED_PORT - PORT for the 'localshed' toolshed (default: 8888)
+##   - Try to ensure that this PORT will resolve in both the container and in a user's web browser
+## - PLANEMO_SERVE_PORT - PORT for connecting to web server for 'planemo serve' (default: 8890)
+## - PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for 'planemo shed_serve' (default: 8889)
+
+# To view the header of this file as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' devplan_bootstrap`
+
+# ref: https://stackoverflow.com/a/246128 -- begin
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# ref: https://stackoverflow.com/a/246128 -- end
+
+# PASSWORD - password for rstudio-server for user 'rstudio'
+PASSWORD=${PASSWORD:?'set PASSWORD to the password of the user rstudio for logging into RStudio'}
+
+# IMAGE - The name of the desired Docker image,
+#   - either local (try 'docker images')
+#   - or remote (search at hub.docker.com)
+IMAGE=${IMAGE:-eschen42/devplan:alpha}
+
+# CONTAINER - the name of the container to be running the image
+CONTAINER=${CONTAINER:-rstudio}
+
+# DOCKER - If you aren't in the group docker, set DOCKER="sudo docker" before running this script
+DOCKER=${DOCKER:-docker}
+DOCKRUN="${DOCKER} run"
+
+# HOMEDIR - path to host folder; if it does not exist it will be created
+HOMEDIR=${HOMEDIR:-~/devplan}
+
+# HOSTINTERFACE - interface where listeners will listen
+#   - 0.0.0.0 will listen to connections from anywhere (security risk)
+#   - 127.0.0.1 will listen to connection requests only from the local machine
+HOSTINTERFACE=${HOSTINTERFACE:-127.0.0.1}
+
+# PREFIX - all but the last two digits of the port numbers on which listeners will listen
+PREFIX=${PREFIX:-88}
+
+# SHED_USERNAME - ID for user in the 'localshed' toolshed
+SHED_USERNAME=demouser
+
+# SHED_USEREMAIL - email for user in the 'localshed' toolshed
+SHED_USEREMAIL=${SHED_USEREMAIL:-demouser@example.net}
+
+# SHED_URL - URL for the 'localshed' toolshed
+#   - Try to ensure that this URL will resolve in both the container and in a user's web browser
+SHED_URL=${SHED_URL:-http://localhost}
+
+# SHED_PORT - PORT for the 'localshed' toolshed
+#   - Try to ensure that this PORT will resolve in both the container and in a user's web browser
+SHED_PORT=${SHED_PORT:-${PREFIX}88}
+
+# PLANEMO_SERVE_PORT - PORT for connecting to web server for 'planemo serve'
+PLANEMO_SERVE_PORT=${PLANEMO_SERVE_PORT:-${PREFIX}90}
+
+# PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for 'planemo shed_serve'
+PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
+
+#  ######## END OF CONFIGURATION VARIABLES  ########
+
+# DEVPLAN - most of the resource mappings needed for 'docker run'
+#   - a docker-compose compose file would be more legible
+DEVPLAN="
+  $DOCKRUN
+    --rm -d
+    -e PASSWORD=${PASSWORD}
+    -v ${HOMEDIR}:/home/rstudio
+    -p ${HOSTINTERFACE}:${PREFIX}87:8787
+    -p ${HOSTINTERFACE}:${SHED_PORT}:${SHED_PORT}
+    -p ${HOSTINTERFACE}:${PLANEMO_SHED_SERVE_PORT}:${PLANEMO_SHED_SERVE_PORT}
+    -p ${HOSTINTERFACE}:${PLANEMO_SERVE_PORT}:${PLANEMO_SERVE_PORT}
+    --name ${CONTAINER} 
+    $IMAGE
+"
+# set up home directory and tool shed if the home directory does not exist on the host
+if [ ! -d ${HOMEDIR} ]; then
+  (
+    # make home directory on the host - this is to ensure that the UID and GUID are correct within the guest
+    mkdir -p ${HOMEDIR}
+    mkdir -p ${HOMEDIR}/kitematic
+    # run homeshed_global script as rstudio
+    $DOCKRUN --rm -i --user rstudio -v ${HOMEDIR}:/home/rstudio $IMAGE bash -c "\
+      PREFIX=$PREFIX \
+      SHED_URL=$SHED_URL \
+      SHED_USERNAME=$SHED_USERNAME \
+      SHED_USEREMAIL=$SHED_USEREMAIL \
+      SHED_PORT=$SHED_PORT \
+      SHED_URL=$SHED_URL \
+      PLANEMO_SERVE_PORT=$PLANEMO_SERVE_PORT \
+      PLANEMO_SHED_SERVE_PORT=$PLANEMO_SHED_SERVE_PORT \
+      /setup_homeshed \
+    "
+  ) 1>&2
+else
+  echo "Not re-initializing pre-existing directory ${HOMEDIR}" 1>&2
+fi
+echo export DEVPLAN="\"$DEVPLAN\""
+echo '
+run_docker_rstudio()
+{
+  echo $DEVPLAN exec /init tail -f /dev/null
+  $DEVPLAN exec /init tail -f /dev/null
+  # Print this message when the run_coker_studio function is invoked
+  echo Now a container named \"'${CONTAINER}'\" should be listed when you run \"docker ps\".
+}
+'
+echo "
+To run the container, type 
+  source <( $0 ); run_docker_rstudio
+and press ENTER.
+" 1>&2
+# vim: sw=2 ts=2 et :

@@ -230,7 +230,8 @@
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' Dockerfile`
 
-FROM rocker/verse:3.4.1
+FROM rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
+#FROM rocker/verse:3.4.1
 MAINTAINER Arthur C. Eschenlauer, esch0041@umn.edu
 
 RUN apt-get update

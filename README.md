@@ -227,3 +227,36 @@ If you prefer `nano` as your editor, you will want to:
        # turn off vi-mode command-line editing-behavior
        set +o vi
     ```
+
+# Use cases for container setup
+
+You can automate the set-up of the Docker container on the Docker host by running the devplan_bootstrap script.
+You probably don't want to run the script as root.
+
+Set some environment variables (preferably in a file), and then invoke the script.  For example:
+```
+. global_server_enviroment
+path/to/devplan_bootstrap
+```
+
+Here are the environment variables used by the script:
+- PASSWORD - password for rstudio-server for user 'rstudio' (required)
+- IMAGE - The name of the desired Docker image (default: eschen42/devplan:alpha),
+  - local image-name (try 'docker images')
+  - published image-name (search at https://hub.docker.com/r/eschen42/devplan/tags/)
+- CONTAINER - the name of the container to be running the image (default: rstudio)
+- DOCKER - command to run docker (default: docker)
+   - If you aren't in the group docker, set DOCKER="sudo docker"
+- HOMEDIR - path to host folder; if it does not exist it will be created
+- HOSTINTERFACE - interface where listeners will listen (default: 127.0.0.1)
+  - 0.0.0.0 will listen to connections from anywhere (security risk)
+  - 127.0.0.1 will listen to connection requests only from the local machine
+- PREFIX - all but the last two digits of the port numbers on which listeners will listen (default:88)
+- SHED_USERNAME - ID for user in the 'localshed' toolshed (default: demouser)
+- SHED_USEREMAIL - email for user in the 'localshed' toolshed (default: demouser@example.net)
+- SHED_URL - URL for the 'localshed' toolshed (default: http://localhost)
+  - Try to ensure that this URL will resolve in both the container and in a user's web browser
+- SHED_PORT - PORT for the 'localshed' toolshed (default: 8888)
+  - Try to ensure that this PORT will resolve in both the container and in a user's web browser
+- PLANEMO_SERVE_PORT - PORT for connecting to web server for 'planemo serve' (default: 8890)
+- PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for 'planemo shed_serve' (default: 8889)

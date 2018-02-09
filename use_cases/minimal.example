@@ -1,0 +1,2 @@
+# change this to something not casually guessable
+export PASSWORD=something.not.casually.guessable
