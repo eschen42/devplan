@@ -230,8 +230,16 @@
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' Dockerfile`
 
+# rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
+#   is the Docker image that was tagged rocker/verse:3.4.1 as of January, 2018.
+#   It was built around RStudio 1.1 and R 3.4.1.
+#   In February, this tag changed to use RStudio 1.0 instead.
+#     https://github.com/rocker-org/rocker-versioned/pull/69
+#   Because I started with RStudio 1.1 (which only came out nine days after R 3.4.1 was released),
+#   and because the UI for 1.1 has 'Terminal' rather than 'Shell', 
+#   I am pinning the base of my build to the January, 2018 version.
 FROM rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
-#FROM rocker/verse:3.4.1
+# was FROM rocker/verse:3.4.1
 MAINTAINER Arthur C. Eschenlauer, esch0041@umn.edu
 
 RUN apt-get update
