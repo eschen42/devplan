@@ -5,15 +5,15 @@ usage ()
   echo '
   Usage: /run_planemo_serve [optional parameters to be passed through to "planemo serve"]
    e.g.: /run_planemo_serve --port 9090
-     or: /run_planemo_serve 
-  Take the toolshed name from ~/.planemo.yml
-  If you do not supply the port argument, "planemo serve" will listen on port 9090 by default.
+     or: /run_planemo_serve
+  If you do not supply the port argument, "planemo serve" will listen on port '$PLANEMO_SERVE_PORT' by default.
   '
 }
 if [ $1_ == --help_ ]; then
   usage
   exit 0
 fi
+TEMP_LOG_FILE=~/planemoserve
 PLANEMO_SERVE="
 planemo serve
   $PLANEMOPARMS
@@ -21,16 +21,15 @@ planemo serve
   --conda_dependency_resolution
   .
 "
-TEMP_LOG_FILE=~/planemoserve.log
 echo $PLANEMO_SERVE
-$PLANEMO_SERVE &> "$TEMP_LOG_FILE" & 
+$PLANEMO_SERVE &> "$TEMP_LOG_FILE.log" &
 LASTPID=$!
 cat << .
    'planemo serve' is running as process ID $LASTPID
      - When it is up it should be listening on port ${PLANEMO_SERVE_PORT:-9090}
        unless you invoked /run_planemo_serve with the --port argument.
      - To see the 'planemo serve' log:
-             tail -f $TEMP_LOG_FILE
+             tail -f $TEMP_LOG_FILE.log
      - You can shut down 'planemo serve' with the command:
              /kill_group --pid $LASTPID
          - or, equivalently, run:

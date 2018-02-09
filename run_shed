@@ -1,12 +1,12 @@
 #!/bin/bash
 ### set up toolshed
-if [ ! -d ~/shed ]; then
+SHED_ROOT=${SHED_ROOT:-~/shed}
+if [ ! -d $SHED_ROOT ]; then
   echo "Please run '/setup_shed' before running '/run_shed'"
   /setup_shed --help
   exit 1
 fi
 TEMP_LOG_FILE=~/toolshed
-#nohup ~/shed/galaxyproject-galaxy/run_tool_shed.sh &> "$TEMP_LOG_FILE" & 
 $SHED_ROOT/galaxyproject-galaxy/run_tool_shed.sh --daemonize $TEMP_LOG_FILE.log --pidfile $TEMP_LOG_FILE.pid
 LASTPID=`cat $TEMP_LOG_FILE.pid`
 cat << .
