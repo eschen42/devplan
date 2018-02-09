@@ -5,7 +5,7 @@
 This image provides for Planemo development and RStudio package development:
 
   - R 3.4.1
-  - RStudio, using this version of R.
+  - RStudio 1.1, using R 3.4.1.
   - The R package `devtools` for package development, including vignette-building capability.
   - The lastest version of Planemo (currently 0.47.0) for development and testing of Galaxy tool wrappers.
   - Extra support for running a local tool shed with the container to test creating and updating tools in the tool shed.

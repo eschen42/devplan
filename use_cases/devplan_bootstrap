@@ -93,6 +93,9 @@ PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
 
 #  ######## END OF CONFIGURATION VARIABLES  ########
 
+# be sure that the specified image is up-to-date
+$DOCKER pull $IMAGE
+
 # DEVPLAN - most of the resource mappings needed for 'docker run'
 #   - a docker-compose compose file would be more legible
 DEVPLAN="
