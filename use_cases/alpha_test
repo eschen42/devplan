@@ -1,0 +1,43 @@
+#!/bin/bash
+
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
+testSeedHome() {
+  (
+     pushd $SCRIPTPATH
+     if [ -f alpha ]; then
+       . alpha
+     else
+       . alpha.example
+     fi
+     docker pull $IMAGE
+  )
+  PULL_RESULT=$?
+  assertEqual 0 $PULL_RESULT
+  if [ 0 -eq $PULL_RESULT ]; then
+    (
+       pushd $SCRIPTPATH
+       if [ -d alpha-home ]; then rm -rf alpha-home; fi
+       if [ -f alpha ]; then
+         . alpha
+       else
+         . alpha.example
+       fi
+       # redirect stderr to pipe - ref: https://stackoverflow.com/a/2342841
+       #  e.g.: (echo something 1>&2) 2>&1 >/dev/null | grep 'something'
+       ( ./devplan_bootstrap ) 2>&1 >/dev/null | tee alpha-seedhome-result.txt
+    )
+    BOOTSTRAP_RESULT=$?
+    assertEqual 0 $BOOTSTRAP_RESULT
+    if [ 0 -eq $BOOTSTRAP_RESULT ]; then
+      assertEqual 1 `grep 'Successfully installed.* planemo-' ${SCRIPTPATH}/alpha-seedhome-result.txt  | wc -l`
+      assertEqual 1 `grep demouser ${SCRIPTPATH}/alpha-home/shed/galaxyproject-galaxy/config/tool_shed.yml  | wc -l`
+      assertEqual 1 `grep demouser ${SCRIPTPATH}/alpha-home/.planemo.yml  | wc -l`
+    fi
+  fi
+}
+
+# run the tests
+source $SCRIPTPATH/bashunit.bash
+
+# vim: sw=2 ts=2 et :

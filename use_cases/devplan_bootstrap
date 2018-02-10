@@ -117,7 +117,7 @@ if [ ! -d ${HOMEDIR} ]; then
     mkdir -p ${HOMEDIR}
     mkdir -p ${HOMEDIR}/kitematic
     # run homeshed_global script as rstudio
-    $DOCKRUN --rm -i --user rstudio -v ${HOMEDIR}:/home/rstudio $IMAGE bash -c "\
+    $DOCKRUN --name ${CONTAINER} --rm -i --user rstudio -v ${HOMEDIR}:/home/rstudio $IMAGE bash -c "\
       PREFIX=$PREFIX \
       SHED_URL=$SHED_URL \
       SHED_USERNAME=$SHED_USERNAME \

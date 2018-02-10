@@ -1,0 +1,16 @@
+# change this to something not casually guessable
+export PASSWORD=something.not.casually.guessable
+# replace the following with a released tag https://hub.docker.com/r/eschen42/devplan/tags/
+export IMAGE=devplan
+#export IMAGE=devplan
+export CONTAINER=devplanimage
+export DOCKER=docker
+export HOMEDIR=`pwd`/image-home
+export HOSTINTERFACE=127.0.0.1
+export PREFIX=83
+export SHED_USERNAME=demouser
+export SHED_USEREMAIL=demouser@example.net
+export SHED_URL=http://127.0.0.1
+export SHED_PORT=8388
+export PLANEMO_SERVE_PORT=8390
+export PLANEMO_SHED_SERVE_PORT=8389
