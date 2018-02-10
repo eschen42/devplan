@@ -12,7 +12,7 @@
 ##
 ## To update README.md:
 ## ```
-## make
+## make doc
 ## ```
 ##
 ## To push changes to origin (after checking for uncommited changes):
@@ -20,9 +20,12 @@
 ## make push
 ## ```
 
+default:
+	echo 'usage: make doc|push|test_alpha|test_image'
+
 # rule to update README.md
-README.md: Dockerfile use_cases/devplan_bootstrap
-	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' Dockerfile Makefile use_cases/devplan_bootstrap > README.md
+doc: build/Dockerfile use_cases/devplan_bootstrap
+	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' build/Dockerfile Makefile use_cases/devplan_bootstrap > README.md
 
 # rule to push git changes
 push:
@@ -35,10 +38,10 @@ bashunit:
 
 # run tests on eschen42/devplan:alpha tag from docker hub
 test_alpha: bashunit
-	pushd use_cases > /dev/null; ./alpha_test --lineshow
+	cd use_cases; ./alpha_test --lineshow
 
 # run tests on image built locally
 test_image: bashunit
-	pushd use_cases > /dev/null; ./image_test --lineshow
+	cd use_cases; ./image_test --lineshow
 
 # vim: noet :

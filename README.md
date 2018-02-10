@@ -241,7 +241,7 @@ make test_alpha
 
 To update README.md:
 ```
-make
+make doc
 ```
 
 To push changes to origin (after checking for uncommited changes):

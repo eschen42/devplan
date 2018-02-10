@@ -93,9 +93,6 @@ PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
 
 #  ######## END OF CONFIGURATION VARIABLES  ########
 
-# be sure that the specified image is up-to-date
-$DOCKER pull $IMAGE
-
 # DEVPLAN - most of the resource mappings needed for 'docker run'
 #   - a docker-compose compose file would be more legible
 DEVPLAN="
@@ -144,7 +141,7 @@ run_docker_rstudio()
 '
 echo "
 To run the container, type 
-  source <( $0 ); run_docker_rstudio
+  source <( source some.file.declaring.environment.variables; $0 ); run_docker_rstudio
 and press ENTER.
 " 1>&2
 # vim: sw=2 ts=2 et :
