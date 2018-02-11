@@ -18,6 +18,7 @@ testSeedHome() {
     echo Neither file ${UNIT} nor file ${UNIT}.example was found.
     exit 1
   fi
+  echo Setup environment read from $MYSETUP
   if [ ${UNIT} != image ]; then
     # pull the image from hub.docker.com
     (
@@ -31,7 +32,7 @@ testSeedHome() {
     # build the image from ../build
     (
        cd $SCRIPTPATH
-       cd ..
+       cd ../build
        docker build -t devplan .
     )
     IMAGE_BUILD_RESULT=$?
@@ -43,7 +44,8 @@ testSeedHome() {
        if [ -d ${UNIT}-home ]; then rm -rf ${UNIT}-home; fi
        # redirect stderr to pipe - ref: https://stackoverflow.com/a/2342841
        #  e.g.: (echo something 1>&2) 2>&1 >/dev/null | grep 'something'
-       ( ./devplan_bootstrap $MYSETUP ) 2>&1 >/dev/null | tee ${UNIT}-seedhome-result.txt
+       echo Setup environment is $MYSETUP
+       ( source ./devplan_bootstrap $MYSETUP ) 2>&1 >/dev/null | tee ${UNIT}-seedhome-result.txt
     )
     BOOTSTRAP_RESULT=$?
     assertEqual 0 $BOOTSTRAP_RESULT
