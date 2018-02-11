@@ -93,22 +93,14 @@ PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
 
 #  ######## END OF CONFIGURATION VARIABLES  ########
 
-if [ `whoami` == root ]; then
-  echo "
-    Please do not run $0 as root.
-    If you cannot run docker as non-root, please consider
-    adding yourself to the 'docker' group or setting the
-      DOCKER='sudo docker'
-  "
-  exit 1
-fi
-
 if [ $# -gt 0 ]; then
   source $*
 fi
 
 # be sure that the specified image is up-to-date
-$DOCKER pull $IMAGE 1>&2
+if [ $IMAGE != devplan ]; then
+  $DOCKER pull $IMAGE 1>&2
+fi
 
 # DEVPLAN - most of the resource mappings needed for 'docker run'
 #   - a docker-compose compose file would be more legible
@@ -147,6 +139,9 @@ if [ ! -d ${HOMEDIR} ]; then
     # make home directory on the host - this is to ensure that the UID and GUID are correct within the guest
     mkdir -p ${HOMEDIR}
     mkdir -p ${HOMEDIR}/kitematic
+    if [ `whoami` == root ]; then
+      chown 1000:1000 ${HOMEDIR} ${HOMEDIR}/kitematic
+    fi
     # run homeshed_global script as rstudio
     $DOCKRUN --name ${CONTAINER} --rm -i --user rstudio -v ${HOMEDIR}:/home/rstudio $IMAGE bash -c "\
       PREFIX=$PREFIX \

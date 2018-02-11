@@ -4,24 +4,31 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 testSeedHome() {
   (
-     pushd $SCRIPTPATH
-     cd ..
-     docker build -t devplan .
+     cd $SCRIPTPATH
+     if [ -f image ]; then
+       . image
+     else
+       . image.example
+     fi
+     cd ../build
+     $DOCKER build -t devplan .
   )
   IMAGE_BUILD_RESULT=$?
   assertEqual 0 $IMAGE_BUILD_RESULT
   if [ 0 -eq $IMAGE_BUILD_RESULT ]; then
     (
-       pushd $SCRIPTPATH
+       cd $SCRIPTPATH
        if [ -d image-home ]; then rm -rf image-home; fi
-       if [ -f image ]; then
-         . image
-       else
-         . image.example
-       fi
        # redirect stderr to pipe - ref: https://stackoverflow.com/a/2342841
        #  e.g.: (echo something 1>&2) 2>&1 >/dev/null | grep 'something'
-       ( ./devplan_bootstrap ) 2>&1 >/dev/null | tee image-seedhome-result.txt
+       (
+         if [ -f image ]; then
+           . image
+         else
+           . image.example
+         fi
+         ./devplan_bootstrap
+       ) 2>&1 >/dev/null | tee image-seedhome-result.txt
     )
     BOOTSTRAP_RESULT=$?
     assertEqual 0 $BOOTSTRAP_RESULT

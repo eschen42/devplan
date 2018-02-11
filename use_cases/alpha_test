@@ -4,28 +4,30 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 testSeedHome() {
   (
-     pushd $SCRIPTPATH
+     cd $SCRIPTPATH
      if [ -f alpha ]; then
        . alpha
      else
        . alpha.example
      fi
-     docker pull $IMAGE
+     $DOCKER pull $IMAGE
   )
   PULL_RESULT=$?
   assertEqual 0 $PULL_RESULT
   if [ 0 -eq $PULL_RESULT ]; then
     (
-       pushd $SCRIPTPATH
+       cd $SCRIPTPATH
        if [ -d alpha-home ]; then rm -rf alpha-home; fi
-       if [ -f alpha ]; then
-         . alpha
-       else
-         . alpha.example
-       fi
        # redirect stderr to pipe - ref: https://stackoverflow.com/a/2342841
        #  e.g.: (echo something 1>&2) 2>&1 >/dev/null | grep 'something'
-       ( ./devplan_bootstrap ) 2>&1 >/dev/null | tee alpha-seedhome-result.txt
+       (
+         if [ -f alpha ]; then
+           . alpha
+         else
+           . alpha.example
+         fi
+         ./devplan_bootstrap
+     ) 2>&1 >/dev/null | tee alpha-seedhome-result.txt
     )
     BOOTSTRAP_RESULT=$?
     assertEqual 0 $BOOTSTRAP_RESULT
