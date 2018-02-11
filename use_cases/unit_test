@@ -22,6 +22,7 @@ testSeedHome() {
   if [ ${UNIT} != image ]; then
     # pull the image from hub.docker.com
     (
+       echo Pull image using setup from $MYSETUP in directory `pwd`
        cd $SCRIPTPATH
        source $MYSETUP
        docker pull $IMAGE
@@ -33,6 +34,7 @@ testSeedHome() {
     (
        cd $SCRIPTPATH
        cd ../build
+       echo Build image from directory `pwd`
        docker build -t devplan .
     )
     IMAGE_BUILD_RESULT=$?
@@ -41,6 +43,8 @@ testSeedHome() {
   if [ 0 -eq ${IMAGE_BUILD_RESULT:-1} -o 0 -eq ${PULL_RESULT:-1} ]; then
     (
        cd $SCRIPTPATH
+       echo Begin bootstrap from $MYSETUP in directory `pwd`
+       source $MYSETUP
        if [ -d ${UNIT}-home ]; then rm -rf ${UNIT}-home; fi
        # redirect stderr to pipe - ref: https://stackoverflow.com/a/2342841
        #  e.g.: (echo something 1>&2) 2>&1 >/dev/null | grep 'something'

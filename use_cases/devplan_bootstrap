@@ -187,11 +187,12 @@ run_compose_rstudio()
 
 echo "
 To run the container, type 
-  source $0 $*; run_docker_rstudio
+  source devplan_bootstrap $*; run_docker_rstudio
 and press ENTER.
 
 Or, to run using docker-compose, type 
-  source $0 $*; run_compose_rstudio
+  source devplan_bootstrap $*; run_compose_rstudio
 and press ENTER.
 " 1>&2
+
 # vim: sw=2 ts=2 et :
