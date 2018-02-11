@@ -227,24 +227,32 @@ If you prefer `nano` as your editor, you will want to:
        # turn off vi-mode command-line editing-behavior
        set +o vi
     ```
+
 # Makefile automation
 
-To build and smoke-test the Docker image locally:
+The GitHub repository has a Makefile to automate some repetitive tasks.
+It is available after you:
+```
+git clone https://github.com/eschen42/devplan
+cd devplan
+```
+
+## To build and smoke-test the Docker image locally:
 ```
 make test_image
 ```
 
-To smoke-test [the `eschen42/devplan:alpha` image from hub.docker.com](https://hub.docker.com/r/eschen42/devplan/tags/):
+## To smoke-test [the `eschen42/devplan:alpha` image from hub.docker.com](https://hub.docker.com/r/eschen42/devplan/tags/):
 ```
 make test_alpha
 ```
 
-To update README.md:
+## To update README.md:
 ```
 make
 ```
 
-To push changes to origin (after checking for uncommited changes):
+## To push changes to origin (after checking for uncommited changes):
 ```
 make push
 ```

@@ -93,8 +93,22 @@ PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
 
 #  ######## END OF CONFIGURATION VARIABLES  ########
 
+if [ `whoami` == root ]; then
+  echo "
+    Please do not run $0 as root.
+    If you cannot run docker as non-root, please consider
+    adding yourself to the 'docker' group or setting the
+      DOCKER='sudo docker'
+  "
+  exit 1
+fi
+
+if [ $# -gt 0 ]; then
+  source $*
+fi
+
 # be sure that the specified image is up-to-date
-$DOCKER pull $IMAGE
+$DOCKER pull $IMAGE 1>&2
 
 # DEVPLAN - most of the resource mappings needed for 'docker run'
 #   - a docker-compose compose file would be more legible
@@ -110,6 +124,23 @@ DEVPLAN="
     --name ${CONTAINER} 
     $IMAGE
 "
+DEVCOMPOSE="version: '3'
+services:
+  ${CONTAINER}:
+    environment:
+      - PASSWORD=${PASSWORD}
+    ports:
+      - ${HOSTINTERFACE}:${PREFIX}87:8787
+      - ${HOSTINTERFACE}:${SHED_PORT}:${SHED_PORT}
+      - ${HOSTINTERFACE}:${PLANEMO_SHED_SERVE_PORT}:${PLANEMO_SHED_SERVE_PORT}
+      - ${HOSTINTERFACE}:${PLANEMO_SERVE_PORT}:${PLANEMO_SERVE_PORT}
+    volumes:
+     - ${HOMEDIR}:/home/rstudio
+    container_name: ${CONTAINER}
+    image: \"${IMAGE}\"
+    command: exec /init tail -f /dev/null
+"
+
 # set up home directory and tool shed if the home directory does not exist on the host
 if [ ! -d ${HOMEDIR} ]; then
   (
@@ -132,19 +163,40 @@ if [ ! -d ${HOMEDIR} ]; then
 else
   echo "Not re-initializing pre-existing directory ${HOMEDIR}" 1>&2
 fi
+
 echo export DEVPLAN="\"$DEVPLAN\""
-echo '
+cat > ${CONTAINER}-compose.yml << EOF
+${DEVCOMPOSE}
+EOF
+
+echo Written to ${CONTAINER}-compose.yml: 1>&2
+cat ${CONTAINER}-compose.yml 1>&2
+
 run_docker_rstudio()
 {
   echo $DEVPLAN exec /init tail -f /dev/null
   $DEVPLAN exec /init tail -f /dev/null
-  # Print this message when the run_coker_studio function is invoked
-  echo Now a container named \"'${CONTAINER}'\" should be listed when you run \"docker ps\".
+  # Print this message when the run_docker_studio function is invoked
+  echo Now a container named \'${CONTAINER}\' should be listed when you run \'docker ps\'
+  echo To stop the container: docker stop ${CONTAINER}
 }
-'
+
+run_compose_rstudio()
+{
+  cat ${CONTAINER}-compose.yml
+  docker-compose -f ${CONTAINER}-compose.yml up -d 
+  # Print this message when the run_compose_rstudio function is invoked
+  echo Now a container named \'${CONTAINER}\' should be listed when you run \'docker ps\'
+  echo To stop the container: docker-compose -f ${CONTAINER}-compose.yml down
+}
+
 echo "
 To run the container, type 
-  source <( $0 ); run_docker_rstudio
+  source $0 $*; run_docker_rstudio
+and press ENTER.
+
+Or, to run using docker-compose, type 
+  source $0 $*; run_compose_rstudio
 and press ENTER.
 " 1>&2
 # vim: sw=2 ts=2 et :
