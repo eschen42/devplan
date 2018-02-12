@@ -37,6 +37,19 @@
 ##       - That approach is quite viable, but it adds complexity that is not easy to explain to others.
 ##     - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
 ##
+## # Quick Start
+##
+## - Start the docker container with the latest alpha (unstable) version:
+## ```
+## git clone https://github.com/eschen42/devplan
+## cd devplan/use_cases
+## source devplan_bootstrap localhost.example
+## run_docker_rstudio
+## ```
+## - Browse to http://localhost:8587 
+## - Build R packages from the Console tab in RStudio
+## - Run Planemo commands from the Terminal tab in RStudio
+##
 ## # How to use this Docker image
 ##
 ## ## Step 1 - Get or build an image

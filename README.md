@@ -37,6 +37,19 @@ I therefore developed this Docker image to bring together into one place functio
       - That approach is quite viable, but it adds complexity that is not easy to explain to others.
     - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
 
+# Quick Start
+
+- Start the docker container with the latest alpha (unstable) version:
+```
+git clone https://github.com/eschen42/devplan
+cd devplan/use_cases
+source devplan_bootstrap localhost.example
+run_docker_rstudio
+```
+- Browse to http://localhost:8587 
+- Build R packages from the Console tab in RStudio
+- Run Planemo commands from the Terminal tab in RStudio
+
 # How to use this Docker image
 
 ## Step 1 - Get or build an image
@@ -259,33 +272,67 @@ make push
 
 # Use cases for container setup
 
-You can automate the set-up of the Docker container on the Docker host by running the devplan_bootstrap script.
+You can automate the set-up of the Docker container on the Docker host by running the `use_cases/devplan_bootstrap` script.
 You probably don't want to run the script as root.
 
-Set some environment variables (preferably in a file), and then invoke the script.  For example:
+Set some environment variables in a file (e.g., `localhost.custom`), and then invoke the script.  For example:
 ```
-. global_server_enviroment
-path/to/devplan_bootstrap
+cd use_cases
+cp localhost.example localhost.custom
+# edit localhost.custom to customize as desired
+source devplan_bootstrap localhost.custom
+# To run the container with docker-compose:
+run_compose_rstudio
+To run the container with docker:
+run_docker_rstudio
 ```
 
-Here are the environment variables used by the script:
-- PASSWORD - password for rstudio-server for user 'rstudio' (required)
+Here are the environment variables used by the `use_cases/devplan_bootstrap` script:
+- PASSWORD - password for rstudio-server for user `rstudio` (required)
 - IMAGE - The name of the desired Docker image (default: eschen42/devplan:alpha),
-  - local image-name (try 'docker images')
+  - local image-name (try `docker images`)
   - published image-name (search at https://hub.docker.com/r/eschen42/devplan/tags/)
 - CONTAINER - the name of the container to be running the image (default: rstudio)
 - DOCKER - command to run docker (default: docker)
-   - If you aren't in the group docker, set DOCKER="sudo docker"
+   - If you are not in the group docker, set `DOCKER="sudo docker"` before sourcing `devplan_bootstrap`
 - HOMEDIR - path to host folder; if it does not exist it will be created
 - HOSTINTERFACE - interface where listeners will listen (default: 127.0.0.1)
   - 0.0.0.0 will listen to connections from anywhere (security risk)
   - 127.0.0.1 will listen to connection requests only from the local machine
 - PREFIX - all but the last two digits of the port numbers on which listeners will listen (default:88)
-- SHED_USERNAME - ID for user in the 'localshed' toolshed (default: demouser)
-- SHED_USEREMAIL - email for user in the 'localshed' toolshed (default: demouser@example.net)
-- SHED_URL - URL for the 'localshed' toolshed (default: http://localhost)
+- SHED_USERNAME - ID for user in the `localshed` toolshed (default: demouser)
+- SHED_USEREMAIL - email for user in the `localshed` toolshed (default: demouser@example.net)
+- SHED_URL - URL for the `localshed` toolshed (default: http://localhost)
   - Try to ensure that this URL will resolve in both the container and in a user's web browser
-- SHED_PORT - PORT for the 'localshed' toolshed (default: 8888)
+- SHED_PORT - PORT for the `localshed` toolshed (default: 8888)
   - Try to ensure that this PORT will resolve in both the container and in a user's web browser
-- PLANEMO_SERVE_PORT - PORT for connecting to web server for 'planemo serve' (default: 8890)
-- PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for 'planemo shed_serve' (default: 8889)
+- PLANEMO_SERVE_PORT - PORT for connecting to web server for `planemo serve` (default: 8890)
+- PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for `planemo shed_serve` (default: 8889)
+
+## `localhost.example` - Configure devplan for connections on the localhost interface
+
+This is a configuration for bootstrapping devplan so that:
+  - You run the Docker container on the same machine where you run your browser 
+  - http://localhost:8587 is to connect to rstudio
+    - user name: rstudio
+    - password: some.password
+  - http://localhost:8588 is to connect to your tool shed
+    - registration name: demouser
+    - registration email: demouser@example.net
+  - http://localhost:8590 is to connect to `planemo serve`, which you start from the terminal tab in RStudio
+  - http://localhost:8589 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
+
+
+## `global.example` - Configure devplan for connections on your.server's global interface
+
+This is a configuration for bootstrapping devplan so that:
+  - You run the Docker container on your.server 
+  - http://your.server:8987 is to connect to rstudio
+    - user name: rstudio
+    - password: some.password
+  - http://your.server:8988 is to connect to your tool shed
+    - registration name: demouser
+    - registration email: demouser@example.net
+  - http://your.server:8990 is to connect to `planemo serve`, which you start from the terminal tab in RStudio
+  - http://your.server:8989 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
+

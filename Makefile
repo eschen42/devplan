@@ -33,7 +33,7 @@ default:
 
 # rule to update README.md
 doc: build/Dockerfile use_cases/devplan_bootstrap
-	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' build/Dockerfile Makefile use_cases/devplan_bootstrap > README.md
+	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' build/Dockerfile Makefile use_cases/devplan_bootstrap use_cases/localhost.example use_cases/global.example > README.md
 
 # rule to push git changes
 push:
@@ -42,7 +42,7 @@ push:
 
 # rule to get unit testing "framework"
 bashunit:
-	if [ ! -f use_cases/bashunit.bash ]; then wget -O use_cases/bashunit.bash https://raw.githubusercontent.com/eschen42/bashunit/master/bashunit.bash; fi
+	if [ ! -f use_cases/bashunit.bash ]; then wget -O use_cases/bashunit.bash https://raw.githubusercontent.com/djui/bashunit/master/bashunit.bash; fi
 
 # run tests on eschen42/devplan:alpha tag from docker hub
 test_alpha: bashunit

@@ -1,8 +1,22 @@
+##
+## ## `localhost.example` - Configure devplan for connections on the localhost interface
+##
+## This is a configuration for bootstrapping devplan so that:
+##   - You run the Docker container on the same machine where you run your browser 
+##   - http://localhost:8587 is to connect to rstudio
+##     - user name: rstudio
+##     - password: some.password
+##   - http://localhost:8588 is to connect to your tool shed
+##     - registration name: demouser
+##     - registration email: demouser@example.net
+##   - http://localhost:8590 is to connect to `planemo serve`, which you start from the terminal tab in RStudio
+##   - http://localhost:8589 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
+##
+
 # change this to something not casually guessable
-export PASSWORD=something.not.casually.guessable
+export PASSWORD=some.password
 # replace the following with a released tag https://hub.docker.com/r/eschen42/devplan/tags/
 export IMAGE=eschen42/devplan:alpha
-#export IMAGE=devplan
 export CONTAINER=rstudio
 export DOCKER=docker
 export HOMEDIR=~/localhost-example
