@@ -55,7 +55,11 @@
 ## - Browse to http://localhost:8587 
 ##   - log in as user `rstudio` with the password that you set above. 
 ## - Build R packages from the Console tab in RStudio
-## - Run Planemo commands from the Terminal tab in RStudio
+## - Run commands from the Terminal tab in RStudio:
+##   - [Start your own toolshed with `/run_shed`](#step-10---browsing-local-tool-shed)
+##   - [Run `planemo test`](#step-6---using-planemo-from-the-guest-command-line)
+##   - [Run `planemo serve`](#step-9---running-planemo-serve)
+##   - [Create a repository for your tool in your local toolshed with `planemo shed_create` and test the repository with `planemo shed_serve`](#step-11---browsing-results-for-planemo-shed_serve)
 ##
 ## # How to use this Docker image
 ##
@@ -153,17 +157,7 @@
 ##        ```
 ##             planemo test --conda_dependency_resolution .
 ##        ```
-##        - Once tests are passing, run the following to serve the tool:
-##        ```
-##             planemo serve --host 0.0.0.0 --conda_dependency_resolution .
-##        ```
-##        - Because you can live-edit your tool and wrapper, you may find it more convenient
-##          to have a daemon serve the current directory:
-##        ```
-##             planemo serve --daemon --host 0.0.0.0 --conda_dependency_resolution .
-##             # or, equivalently
-##             /run_planemo_shed_serve
-##        ```
+##        - Once tests are passing, you can run `planemo serve`: see [Step 9](#step-9---running-planemo-serve)
 ##
 ## ## Step 7 - Setting up the `localshed` tool shed
 ## You can set up a local instance of the Galaxy tool shed; this requires a moderate amount of manual effort:
