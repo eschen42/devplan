@@ -41,12 +41,19 @@ I therefore developed this Docker image to bring together into one place functio
 
 - Start the docker container with the latest alpha (unstable) version:
 ```
+# fetch the bootstrap scripts
 git clone https://github.com/eschen42/devplan
+# change to the directory where the bootstrap scripts are located
 cd devplan/use_cases
+# set this to any password that you prefer
+PASSWORD=password.to.log.into.rstudio.server
+# set up the docker container and home directory
 source devplan_bootstrap localhost.example
+# run the container
 run_docker_rstudio
 ```
 - Browse to http://localhost:8587 
+  - log in as user `rstudio` with the password that you set above. 
 - Build R packages from the Console tab in RStudio
 - Run Planemo commands from the Terminal tab in RStudio
 
