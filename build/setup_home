@@ -91,18 +91,51 @@ if [ ! -f ~/.profile ]; then
   " | sed -e 's/^    //' > ~/.profile
 fi
 
-# - set up ~/.bash_profile
-if [ ! -f ~/.bash_profile ]; then
+# - set up ~/.bash_profile.d
+if [ ! -d ~/.bash_profile.d ]; then
+  mkdir ~/.bash_profile.d
   echo '
     . ~/.profile
     . ~/.bashrc
+    if [ -f ~/.ssh/sshd.pid ]; then
+      SSHDPID=$(cat ~/.ssh/sshd.pid)
+      if [ $( test -d /proc/$SSHDPID && cat /proc/$SSHDPID/task/$SSHDPID/comm)_ != sshd_ ]; then
+        echo removing defunct ~/.ssh/sshd.pid
+        rm ~/.ssh/sshd.pid
+      fi
+    fi
+    if [ ! -f ~/.ssh/sshd.pid ]; then
+      function sshd_logout {
+        echo "shutting down sshd"
+        # this removes ~/.ssh/sshd.pid
+        kill `cat ~/.ssh/sshd.pid`
+      }
+      # this creates ~/.ssh/sshd.pid
+      /usr/sbin/sshd -f ~/.ssh/sshd_config
+    else
+      echo "sshd is already running"
+      function sshd_logout {
+        echo ""
+      }
+    fi
     function bash_logout {
       echo killing ssh agent $SSH_AGENT_PID
       kill $SSH_AGENT_PID
       echo "exiting login shell"
     }
     trap bash_logout EXIT
-  ' | sed -e 's/^    //' > ~/.bash_profile
+  ' | sed -e 's/^    //' > ~/.bash_profile.d/sshd_start
+fi
+
+# - set up ~/.bash_profile
+if [ ! -f ~/.bash_profile ]; then
+  echo '
+    # source additional entries from files within ~/.bash_profile.d
+    for f in ~/.bash_profile.d/*; do
+        # echo Sourcing $f
+        . $f
+    done
+  ' | sed -e 's/^    //' >> ~/.bash_profile
 fi
 
 # - set up ~/.bashrc.d
@@ -167,6 +200,16 @@ if [ ! -f ~/.ssh/id_rsa ]; then
 fi
 chmod 700 ~ ~/.ssh
 chmod 600 ~/.ssh/id_rsa
+
+# - set up user-mode sshd
+echo '# setting up user-mode sshd'
+
+pushd ~/.ssh
+ssh-keygen -f ssh_host_rsa_key     -N '' -t dsa
+ssh-keygen -f ssh_host_ecdsa_key   -N '' -t ecdsa
+ssh-keygen -f ssh_host_ed25519_key -N '' -t ed25519
+cp /sshd_config .
+popd
 
 # - prompt setup for git
 if [ ! -f ~/.gitconfig ]; then

@@ -1,3 +1,4 @@
+# vim: sw=2 ts=2 et :
 ## [![DOI](https://zenodo.org/badge/118467922.svg)](https://zenodo.org/badge/latestdoi/118467922)
 ##
 ## # devplan: a Docker image for RStudio and Planemo development
@@ -260,6 +261,8 @@ RUN apt-get update
 
 # texlive-common includes both texlive-science and texlive-latex-extra
 RUN apt-get install -y texlive-common
+#RUN apt-get remove -y texlive-local
+#RUN apt-get install -y texlive-publishers texlive-publishers-doc
 # Set up some utilities that I don't want to be without
 RUN apt-get -y install bzip2 curl wget vim-tiny screen
 RUN update-alternatives --install /usr/bin/vim vim /usr/bin/vim.tiny 10
@@ -280,6 +283,17 @@ RUN sed -i -e '/rstudio:$/ s/:$/:\/bin\/bash/' /etc/passwd
 
 # optional - install man pages (comment out the next line if you don't want them)
 RUN apt-get -y install man-db manpages manpages-dev
+
+# optional - sharutils provides shar
+RUN  apt-get -y install sharutils
+
+# experimental: Run an sshd server for remote access/X - this only can work when /run/sshd exists
+RUN  apt-get -y install openssh-server openssh-sftp-server
+RUN  mkdir /run/sshd
+RUN apt-get -y install xauth xterm xtermcontrol perl-tk
+
+# optional - install lyx
+RUN apt-get -y install lyx
 
 # In rocker/verse, /init starts up s6 services.
 # Define the fixid1 "service" that runs once, changing UID and GID of 'rstudio' user to match those of /home/rstudio
@@ -307,6 +321,8 @@ RUN  bash -c 'chmod +x /run_planemo_serve'
 # Copy the script to kill all members of a process group
 COPY kill_group /kill_group
 RUN  bash -c 'chmod +x /kill_group'
+# Copy the sshd_config file to root directory
+COPY sshd_config /sshd_config
+RUN  bash -c 'chmod 644 /sshd_config'
 
 COPY Dockerfile /Dockerfile
-# vim: sw=2 ts=2 et

@@ -41,15 +41,13 @@
 
 # To view the header of this file as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' devplan_bootstrap`
 
-# ref: https://stackoverflow.com/a/246128 -- begin
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-# ref: https://stackoverflow.com/a/246128 -- end
+if [ $# -gt 0 ]; then
+  source $*
+fi
+
+echo PASSWORD is now set to \"${PASSWORD}\" 1>&2
+
+#  ######## START OF CONFIGURATION-VARIABLES SECTION ########
 
 # PASSWORD - password for rstudio-server for user 'rstudio'
 PASSWORD=${PASSWORD:?'set PASSWORD to the password of the user rstudio for logging into RStudio'}
@@ -97,11 +95,18 @@ PLANEMO_SERVE_PORT=${PLANEMO_SERVE_PORT:-${PREFIX}90}
 # PLANEMO_SHED_SERVE_PORT - PORT for connecting to web server for 'planemo shed_serve'
 PLANEMO_SHED_SERVE_PORT=${PLANEMO_SHED_SERVE_PORT:-${PREFIX}89}
 
-#  ######## END OF CONFIGURATION VARIABLES  ########
+#  ######## END OF CONFIGURATION-VARIABLES SECTION ########
 
-if [ $# -gt 0 ]; then
-  source $*
-fi
+# ref: https://stackoverflow.com/a/246128 -- begin
+SOURCE="${BASH_SOURCE[0]}"
+echo PASSWORD is initially set to \"${PASSWORD}\" 1>&2
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# ref: https://stackoverflow.com/a/246128 -- end
 
 # be sure that the specified image is up-to-date
 if [ $IMAGE != devplan ]; then
@@ -109,7 +114,6 @@ if [ $IMAGE != devplan ]; then
 fi
 
 # DEVPLAN - most of the resource mappings needed for 'docker run'
-#   - a docker-compose compose file would be more legible
 DEVPLAN="
   $DOCKRUN
     --rm -d
@@ -136,7 +140,7 @@ services:
      - ${HOMEDIR}:/home/rstudio
     container_name: ${CONTAINER}
     image: \"${IMAGE}\"
-    command: exec /init tail -f /dev/null
+    command: exec /init su -l -c 'tail -f /dev/null' rstudio
 "
 
 # set up home directory and tool shed if the home directory does not exist on the host
@@ -146,7 +150,8 @@ if [ ! -d ${HOMEDIR} ]; then
     mkdir -p ${HOMEDIR}
     mkdir -p ${HOMEDIR}/kitematic
     if [ `whoami` == root ]; then
-      chown 1000:1000 ${HOMEDIR} ${HOMEDIR}/kitematic
+      chown 1000:1000 ${HOMEDIR}
+      chown 1000:1000 ${HOMEDIR}/kitematic
     fi
     # run homeshed_global script as rstudio
     $DOCKRUN --name ${CONTAINER} --rm -i --user rstudio -v ${HOMEDIR}:/home/rstudio $IMAGE bash -c "\
@@ -175,21 +180,54 @@ cat ${CONTAINER}-compose.yml 1>&2
 
 run_docker_rstudio()
 {
-  echo $DEVPLAN exec /init tail -f /dev/null
-  $DEVPLAN exec /init tail -f /dev/null
+  echo $DEVPLAN exec /init su -l -c 'tail -f /dev/null' rstudio
+  $DEVPLAN exec /init su -l -c 'tail -f /dev/null' rstudio
   # Print this message when the run_docker_studio function is invoked
   echo Now a container named \'${CONTAINER}\' should be listed when you run \'docker ps\'
   echo To stop the container: docker stop ${CONTAINER}
 }
 
+RUNCOMPOSERSTUDIOFILE=$DIR/${CONTAINER}.tmp
+cat > $RUNCOMPOSERSTUDIOFILE << EOF
 run_compose_rstudio()
 {
-  cat ${CONTAINER}-compose.yml
-  docker-compose -f ${CONTAINER}-compose.yml up -d 
+  # change FOO=bar to FOO='bar' 
+  # change FOO=foo'bar to FOO='foo'"'"'bar' 
+  $( printenv | sed -e "s/'/'\"'\"'/g; s/^\([^=]*\)=\(.*\)/\1='\2'/" ) 
+  if [ -f ${CONTAINER}-extend.yml ]; then
+    EXTEND='-f ${CONTAINER}-extend.yml'
+    echo 'FYI - ${CONTAINER}-extend.yml WAS found'
+    cat ${CONTAINER}-compose.yml ${CONTAINER}-extend.yml
+  else
+    EXTEND=''
+    echo 'FYI - ${CONTAINER}-extend.yml was NOT found'
+    cat ${CONTAINER}-compose.yml
+  fi
+  docker-compose -f ${CONTAINER}-compose.yml \$EXTEND up -d 
   # Print this message when the run_compose_rstudio function is invoked
   echo Now a container named \'${CONTAINER}\' should be listed when you run \'docker ps\'
-  echo To stop the container: docker-compose -f ${CONTAINER}-compose.yml down
+  echo "$COMPOSEMSG"
+  echo "To stop the container:"
+  echo "  docker-compose -f ${CONTAINER}-compose.yml down"
+  echo "or:"
+  echo "  stop_compose_rstudio"
 }
+stop_compose_rstudio()
+{
+  docker-compose -f ${CONTAINER}-compose.yml down
+}
+EOF
+
+# echo about to source run_compose_rstudio 1>&2
+# echo "$RUNCOMPOSERSTUDIO" 1>&2
+# sleep 1
+echo sourcing run_compose_rstudio 1>&2
+source $RUNCOMPOSERSTUDIOFILE
+# sleep 1
+echo sourced run_compose_rstudio 1>&2
+# echo post-sourcing set BEGIN 1>&2
+# set 1>&2
+# echo post-sourcing set END 1>&2
 
 echo "
 To run the container, type 
