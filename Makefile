@@ -33,7 +33,7 @@ default:
 
 # rule to update README.md
 doc: build/Dockerfile use_cases/devplan_bootstrap
-	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' build/Dockerfile Makefile use_cases/devplan_bootstrap use_cases/localhost.example use_cases/global.example > README.md
+	sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$$//; p' build/Dockerfile Makefile use_cases/devplan_bootstrap use_cases/localhost.example use_cases/localhost.xexample use_cases/global.example > README.md
 
 # rule to push git changes
 push:

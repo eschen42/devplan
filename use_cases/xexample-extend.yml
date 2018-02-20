@@ -1,0 +1,5 @@
+version: '3'
+services:
+  xexample:
+    ports:
+      - 127.0.0.1:${PREFIX}22:2222

@@ -13,10 +13,12 @@
 ##   - http://your.server:8989 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
 ##
 
-# change this password to something not casually guessable
-export PASSWORD=some.password
+# TODO change this to something not casually guessable
+export PASSWORD=${PASSWORD:-some.password}
+
 # replace the following with a released tag https://hub.docker.com/r/eschen42/devplan/tags/
 export IMAGE=eschen42/devplan:alpha
+
 export CONTAINER=rstudio
 export DOCKER=docker
 export HOMEDIR=~/global-example

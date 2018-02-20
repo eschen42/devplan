@@ -324,6 +324,27 @@ This is a configuration for bootstrapping devplan so that:
   - http://localhost:8589 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
 
 
+## `localhost.xexample` - Configure devplan for connections on the localhost interface with support for X clients
+
+This is a configuration for bootstrapping devplan so that:
+  - You run the Docker container on the same machine where you run your browser 
+  - http://localhost:8387 is to connect to rstudio
+    - user name: rstudio
+    - password: some.password
+  - http://localhost:8388 is to connect to your tool shed
+    - registration name: demouser
+    - registration email: demouser@example.net
+  - http://localhost:8390 is to connect to `planemo serve`, which you start from the terminal tab in RStudio
+  - http://localhost:8389 is to connect to `planemo shed_serve`, which you start from the terminal tab in RStudio
+  - `ssh -Y -p ${PREFIX}22 rstudio@localhost` from an `xterm` to run GUI clients within the container (e.g., `xterm` and `lyx`) 
+
+Bootstrap this configuration with the following commands:
+```
+  cd use_cases
+  source devplan_bootstrap localhost.xexample xexample-extend.yml; run_compose_rstudio
+```
+Note that, if you change the CONTAINER variable in `localhost.xexample`, then you will need to change the corresponding service name in `xexample-extend.yml`. 
+
 ## `global.example` - Configure devplan for connections on your.server's global interface
 
 This is a configuration for bootstrapping devplan so that:
