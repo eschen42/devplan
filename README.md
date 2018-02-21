@@ -276,9 +276,10 @@ make push
 You can automate the set-up of the Docker container on the Docker host by running the `use_cases/devplan_bootstrap` script.
 You probably don't want to run the script as root.
 
-Set some environment variables in a file (e.g., `localhost.custom`), and then invoke the script.  For example:
+Set some environment variables in a file (e.g., `localhost.custom`), and then invoke the script.  There are several examples to choose from.  For example:
 ```
-cd use_cases
+git clone git@github.com:eschen42/devplan.git
+cd devplan/use_cases
 cp localhost.example localhost.custom
 # edit localhost.custom to customize as desired
 source devplan_bootstrap localhost.custom
