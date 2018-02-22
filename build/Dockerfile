@@ -37,6 +37,12 @@
 ##       rather than using docker-compose to map ports and volumes among several images.
 ##       - That approach is quite viable, but it adds complexity that is not easy to explain to others.
 ##     - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
+##   - Currently at 3.25 Gb, this is a large image, intended to provide functionality including:
+##     - X clients for LyX, RStudio, and xterm.
+##     - A (user-mode) SSH server as a convenient way for X clients to connect to an X server.
+##   - I can imagine making a smaller version with less functionality, based on Alpine, or a small suite of Docker
+##     images, designed to share a home directory, but for now this fills my need to have in one place everything
+##     that I need to be immediately productive.
 ##
 ## # Quick Start
 ##
@@ -331,7 +337,7 @@ RUN wget https://download1.rstudio.org/rstudio-xenial-1.1.383-amd64.deb \
     && dpkg -i rstudio-xenial-1.1.383-amd64.deb \
     && rm rstudio-xenial-*-amd64.deb
 
-# Get xpdf to view PDFs and poppler-utils to manipulate them
+# Get X client xpdf to view PDFs and poppler-utils to manipulate them
 #   ref: https://en.wikipedia.org/wiki/Poppler_(software)#poppler-utils
 #   ref: https://en.wikipedia.org/wiki/Xpdf
 RUN apt-get -y install xpdf poppler-utils
