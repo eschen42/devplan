@@ -2,7 +2,7 @@
 ## ## `localhost.example` - Configure devplan for connections on the localhost interface
 ##
 ## This is a configuration for bootstrapping devplan so that:
-##   - You run the Docker container on the same machine where you run your browser 
+##   - You run the Docker container on the same machine where you run your browser
 ##   - http://localhost:8587 is to connect to rstudio
 ##     - user name: rstudio
 ##     - password: some.password

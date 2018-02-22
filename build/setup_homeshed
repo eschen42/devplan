@@ -3,7 +3,6 @@
 ## This script will:
 ## - set up your home directory
 ## - initialize (but not start) a Galaxy tool shed
-## - will 
 ## ## Required environment variable:
 ## - `SHED_URL` - URL for the 'localshed' toolshed
 ##   - Try to ensure that this URL will resolve in both the container and in a user's web browser

@@ -124,7 +124,7 @@ DEVPLAN="
     -p ${HOSTINTERFACE}:${SHED_PORT}:${SHED_PORT}
     -p ${HOSTINTERFACE}:${PLANEMO_SHED_SERVE_PORT}:${PLANEMO_SHED_SERVE_PORT}
     -p ${HOSTINTERFACE}:${PLANEMO_SERVE_PORT}:${PLANEMO_SERVE_PORT}
-    --name ${CONTAINER} 
+    --name ${CONTAINER}
     $IMAGE
 "
 DEVCOMPOSE="version: '3'
@@ -192,9 +192,9 @@ RUNCOMPOSERSTUDIOFILE=$DIR/${CONTAINER}.tmp
 cat > $RUNCOMPOSERSTUDIOFILE << EOF
 run_compose_rstudio()
 {
-  # change FOO=bar to FOO='bar' 
-  # change FOO=foo'bar to FOO='foo'"'"'bar' 
-  $( printenv | sed -e "s/'/'\"'\"'/g; s/^\([^=]*\)=\(.*\)/\1='\2'/" ) 
+  # change FOO=bar to FOO='bar'
+  # change FOO=foo'bar to FOO='foo'"'"'bar'
+  $( printenv | sed -e "s/'/'\"'\"'/g; s/^\([^=]*\)=\(.*\)/\1='\2'/" )
   if [ -f ${CONTAINER}-extend.yml ]; then
     EXTEND='-f ${CONTAINER}-extend.yml'
     echo 'FYI - ${CONTAINER}-extend.yml WAS found'
@@ -204,7 +204,7 @@ run_compose_rstudio()
     echo 'FYI - ${CONTAINER}-extend.yml was NOT found'
     cat ${CONTAINER}-compose.yml
   fi
-  docker-compose -f ${CONTAINER}-compose.yml \$EXTEND up -d 
+  docker-compose -f ${CONTAINER}-compose.yml \$EXTEND up -d
   # Print this message when the run_compose_rstudio function is invoked
   echo Now a container named \'${CONTAINER}\' should be listed when you run \'docker ps\'
   echo "$COMPOSEMSG"
@@ -231,11 +231,11 @@ echo sourced run_compose_rstudio 1>&2
 # echo post-sourcing set END 1>&2
 
 echo "
-To run the container, type 
+To run the container, type
   source devplan_bootstrap $*; run_docker_rstudio
 and press ENTER.
 
-Or, to run using docker-compose, type 
+Or, to run using docker-compose, type
   source devplan_bootstrap $*; run_compose_rstudio
 and press ENTER.
 " 1>&2

@@ -154,7 +154,7 @@ if [ ! -f $TOOLSHEDYML ]; then
 else
   cp $TOOLSHEDYML $TOOLSHEDYML.old
   TOOLSHEDYMLSRC=$TOOLSHEDYML.old
-fi  
+fi
 
 
 # Indentation here is critical - no extra spaces or tabs permitted
@@ -207,7 +207,7 @@ sed -i -e "
 
 echo "
   The shed is now set up.
-    - The email address(es) of the admin user(s) are defined 
+    - The email address(es) of the admin user(s) are defined
       in $TOOLSHEDYML as
         $_arg_admin
   Now you will want to:
@@ -220,11 +220,11 @@ echo "
       - Add the shed category (or categories) appropriate for your tool
       - Navigate to 'User > API Keys' and generate an API key.
       - Copy the API key.
-    - Replace the API key under 'localshed' in ~/.planemo.yml with 
+    - Replace the API key under 'localshed' in ~/.planemo.yml with
       the API key generated above, and make sure that the port for
       the URL is set to $_arg_port.
 
-  These changes will be persistent, so that the next time you run 
+  These changes will be persistent, so that the next time you run
     /run_shed
   you will not need to repeat them.
 
