@@ -36,6 +36,12 @@ I therefore developed this Docker image to bring together into one place functio
       rather than using docker-compose to map ports and volumes among several images.
       - That approach is quite viable, but it adds complexity that is not easy to explain to others.
     - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
+  - Currently at 3.25 Gb, this is a large image, intended to provide functionality including:
+    - X clients for LyX, RStudio, and xterm.
+    - A (user-mode) SSH server as a convenient way for X clients to connect to an X server.
+  - I can imagine making a smaller version with less functionality, based on Alpine, or a small suite of Docker
+    images, designed to share a home directory, but for now this fills my need to have in one place everything
+    that I need to be immediately productive.
 
 # Quick Start
 
@@ -52,8 +58,8 @@ source devplan_bootstrap localhost.example
 # run the container
 run_docker_rstudio
 ```
-- Browse to http://localhost:8587 
-  - log in as user `rstudio` with the password that you set above. 
+- Browse to http://localhost:8587
+  - log in as user `rstudio` with the password that you set above.
 - Build R packages from the Console tab in RStudio
 - Run commands from the Terminal tab in RStudio:
   - [Start your own toolshed with `/run_shed`](#step-10---browsing-local-tool-shed)
@@ -104,7 +110,7 @@ If you would like to use a pre-built image you can find a tagged release at [htt
        #   --name devplan -   nicknamed devplan
        #   --rm           -   automatic clean-up when container stops
        #   -ti            -   allow interaction with the keyboard
-       #   -p 8787:8787   -   allow connection on localhost port 8787 to connect to Rstudio in the container 
+       #   -p 8787:8787   -   allow connection on localhost port 8787 to connect to Rstudio in the container
        #   -p 8790:8790   -   allow connection on localhost port 8790 to planemo serve and planemo shed_serve
        #   -p 8709:8709   -   allow connection on localhost port 8709 to a local instance of Galaxy toolshed
        #   -v ~/rstudio:/home/rstudio
@@ -168,7 +174,7 @@ You can set up a local instance of the Galaxy tool shed; this requires a moderat
   - *Note well*: You will most likely want to access your tool shed through the browser as "localhost" on the same port as
     the tool shed server is listening to in the container.  At some point, you may want to install to an instance of Galaxy
     running in your container, using the administrative interface of the Galaxy web interface; because the tool shed and the
-    web interact by passing the URL of the toolshed back and forth, you can avoid some "broken" URLs this way. 
+    web interact by passing the URL of the toolshed back and forth, you can avoid some "broken" URLs this way.
 
 ## Step 8 - Running RStudio
    - On the host, browse to RStudio at http://localhost:8787
@@ -314,7 +320,7 @@ Here are the environment variables used by the `use_cases/devplan_bootstrap` scr
 ## `localhost.example` - Configure devplan for connections on the localhost interface
 
 This is a configuration for bootstrapping devplan so that:
-  - You run the Docker container on the same machine where you run your browser 
+  - You run the Docker container on the same machine where you run your browser
   - http://localhost:8587 is to connect to rstudio
     - user name: rstudio
     - password: some.password
