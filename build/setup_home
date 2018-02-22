@@ -12,8 +12,8 @@ fi
 if [ ! -d ~/venv ]; then
   echo "
     Failed to create ~/venv.
-    Is it possible that the directory passed to the Docker 
-      container to persist /home/rstudio was created by root 
+    Is it possible that the directory passed to the Docker
+      container to persist /home/rstudio was created by root
       rather than an unprivileged user?
     If so, you will need to exit the container (using the)
       command 'exit' and restart it with a directory
@@ -50,8 +50,8 @@ fi
 if [ `which planemo`_ != ~/venv/bin/planemo_ ]; then
   echo "
     planemo did not install in ~/venv.
-    Please check your network connection, then try running '/setup_home' 
-      again.  If that does not help, you may want to 
+    Please check your network connection, then try running '/setup_home'
+      again.  If that does not help, you may want to
       'rm -rf ~/venv' and try running '/setup_home' again.
   "
 fi
@@ -69,8 +69,8 @@ if [ `which planemo`_ != ~/venv/bin/planemo_ ]; then
       rm -rf ~/miniconda3
       echo "
         Errors occurred while planemo was installing conda.
-        Please check your network connection, then try running '/setup_home' 
-          again.  If that does not help, you may want to 
+        Please check your network connection, then try running '/setup_home'
+          again.  If that does not help, you may want to
           'rm -rf ~/venv' and try running '/setup_home' again.
       "
     fi
@@ -81,7 +81,6 @@ fi
 if [ ! -f ~/.profile ]; then
 
   echo "
-    export PATH='/usr/local/bin:/usr/bin:/bin'
     eval \`ssh-agent -s\`
     echo 'use ssh-add to add keys to the ssh-agent'
 
@@ -89,6 +88,11 @@ if [ ! -f ~/.profile ]; then
     ROWCOL=\"\$(stty -a | head -n 1 | grep columns | sed -n -e 's/speed [0-9]* baud; rows \([0-9]*\); columns \([0-9]*\);.*/export LINES=\1; export COLUMNS=\2 /; s/.*speed//; p')\"
     \$ROWCOL
   " | sed -e 's/^    //' > ~/.profile
+fi
+
+# - set up ~/.Rprofile
+if [ ! -f ~/.Rprofile ]; then
+  echo '.libPaths(c("~/R/library",.libPaths()))' > ~/.Rprofile
 fi
 
 # - set up ~/.bash_profile.d
