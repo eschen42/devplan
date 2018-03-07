@@ -40,6 +40,7 @@ HostKey ~/.ssh/ssh_host_ed25519_key
 #MaxSessions 10
 
 #PubkeyAuthentication yes
+PubkeyAuthentication yes
 
 # Expect .ssh/authorized_keys2 to be disregarded by default in future.
 #AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
@@ -59,6 +60,7 @@ HostKey ~/.ssh/ssh_host_ed25519_key
 
 # To disable tunneled clear text passwords, change to no here!
 #PasswordAuthentication yes
+PasswordAuthentication no
 #PermitEmptyPasswords no
 
 # Change to yes to enable challenge-response passwords (beware issues with

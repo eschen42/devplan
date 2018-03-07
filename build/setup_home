@@ -101,6 +101,8 @@ if [ ! -d ~/.bash_profile.d ]; then
   echo '
     . ~/.profile
     . ~/.bashrc
+  ' | sed -e 's/^    //' > ~/.bash_profile.d/00-source-profile-bashrc
+  echo '
     if [ -f ~/.ssh/sshd.pid ]; then
       SSHDPID=$(cat ~/.ssh/sshd.pid)
       if [ $( test -d /proc/$SSHDPID && cat /proc/$SSHDPID/task/$SSHDPID/comm)_ != sshd_ ]; then
@@ -115,7 +117,7 @@ if [ ! -d ~/.bash_profile.d ]; then
         kill `cat ~/.ssh/sshd.pid`
       }
       # this creates ~/.ssh/sshd.pid
-      /usr/sbin/sshd -f ~/.ssh/sshd_config
+      /usr/sbin/sshd -f ~/.ssh/sshd_config -E ~/.ssh/sshd_log
     else
       echo "sshd is already running"
       function sshd_logout {
@@ -128,7 +130,7 @@ if [ ! -d ~/.bash_profile.d ]; then
       echo "exiting login shell"
     }
     trap bash_logout EXIT
-  ' | sed -e 's/^    //' > ~/.bash_profile.d/sshd_start
+  ' | sed -e 's/^    //' > ~/.bash_profile.d/80-sshd_start
 fi
 
 # - set up ~/.bash_profile
