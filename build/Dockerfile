@@ -253,14 +253,17 @@
 #   Because I started with RStudio 1.1 (which only came out nine days after R 3.4.1 was released),
 #   and because the UI for 1.1 has 'Terminal' rather than 'Shell', 
 #   I am pinning the base of my build to the January, 2018 version.
-FROM rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
+# was FROM rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
 # was FROM rocker/verse:3.4.1
+#FROM rocker/shiny:3.6.0
+FROM rocker/verse:3.6.0
 MAINTAINER Arthur C. Eschenlauer, esch0041@umn.edu
 
 RUN apt-get update
 
 # texlive-common includes both texlive-science and texlive-latex-extra
 RUN apt-get install -y texlive-common
+#RUN apt-get install -y texlive-science texlive-latex-extra
 
 # Set up some utilities that I don't want to be without
 RUN apt-get -y install bzip2 curl wget vim-tiny screen
@@ -292,7 +295,7 @@ RUN  mkdir /run/sshd
 RUN apt-get -y install xauth xterm xtermcontrol perl-tk
 
 # optional - install lyx
-RUN apt-get -y install lyx
+# RUN apt-get -y install lyx
 
 # In rocker/verse, /init starts up s6 services.
 # Define the fixid1 "service" that runs once, changing UID and GID of 'rstudio' user to match those of /home/rstudio

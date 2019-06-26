@@ -37,6 +37,12 @@ I therefore developed this Docker image to bring together into one place functio
       - That approach is quite viable, but it adds complexity that is not easy to explain to others.
     - No image can ever have all the utilities that one individual has come to rely upon, so I have added some of my favorites.
 
+# Why Planemo?
+
+Planemo allows us to use this tool-development workflow:
+
+![Planemo tool-development workflow cartoon](./Planemo-dev-workflow.svg)
+
 # Quick Start
 
 - Start the docker container with the latest alpha (unstable) version:
