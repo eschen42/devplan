@@ -327,4 +327,7 @@ RUN  bash -c 'chmod +x /kill_group'
 COPY sshd_config /sshd_config
 RUN  bash -c 'chmod 644 /sshd_config'
 
+# get Python.h
+RUN  apt-get -y install python-dev
+
 COPY Dockerfile /Dockerfile
