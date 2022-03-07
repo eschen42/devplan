@@ -5,8 +5,7 @@
 ##
 ## This image provides for Planemo development and RStudio package development:
 ##
-##   - R 3.4.1
-##   - RStudio 1.1, using R 3.4.1.
+##   - based on rocker/verse 4.1.2 plus:
 ##   - The R package `devtools` for package development, including vignette-building capability.
 ##   - The lastest version of Planemo (currently 0.47.0) for development and testing of Galaxy tool wrappers.
 ##   - Extra support for running a local tool shed with the container to test creating and updating tools in the tool shed.
@@ -31,7 +30,7 @@
 ##
 ## I therefore developed this Docker image to bring together into one place functionality that I have not found in an image available elsewhere.
 ##   - Points of departure:
-##     - The base Docker image is rocker/verse:3.4.1, which allows me to make sure that I will always be building packages that target that version.
+##     - The base Docker image is rocker/verse:4.1.2, which allows me to make sure that I will always be building packages that target that version.
 ##       - When I want to use a newer version of R, I will rebuild the image.
 ##     - The planemo/interactive Docker image is great, but I would like to have everything in a single image
 ##       rather than using docker-compose to map ports and volumes among several images.
@@ -245,18 +244,10 @@
 
 # To view the header of this Dockerfile as markdown, run `sed -n -e '/^##/ !d; /./!d; s/^## //; s/^##$//; p' Dockerfile`
 
-# rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
-#   is the Docker image that was tagged rocker/verse:3.4.1 as of January, 2018.
-#   It was built around RStudio 1.1 and R 3.4.1.
-#   In February, this tag changed to use RStudio 1.0 instead.
-#     https://github.com/rocker-org/rocker-versioned/pull/69
-#   Because I started with RStudio 1.1 (which only came out nine days after R 3.4.1 was released),
-#   and because the UI for 1.1 has 'Terminal' rather than 'Shell', 
-#   I am pinning the base of my build to the January, 2018 version.
-# was FROM rocker/verse@sha256:b0132579bd5dac31b989bbbb2a78aee8616099622257edd3bc6ae70a1ee97c59
-# was FROM rocker/verse:3.4.1
-#FROM rocker/shiny:3.6.0
-FROM rocker/verse:3.6.0
+# rocker/verse@sha256:5a8c4778216288a01ac2f374e53b89b3bba013f4523112d308eb3addf6cee944
+#   is the Docker image that was tagged rocker/verse:4.1.2 as of March, 2022.
+#   It was built around RStudio 4.1.2 and R 4.1.2.
+FROM rocker/verse:4.1.2
 MAINTAINER Arthur C. Eschenlauer, esch0041@umn.edu
 
 RUN apt-get update
@@ -328,6 +319,6 @@ COPY sshd_config /sshd_config
 RUN  bash -c 'chmod 644 /sshd_config'
 
 # get Python.h
-RUN  apt-get -y install python-dev
+RUN  apt-get -y install python3-dev
 
 COPY Dockerfile /Dockerfile
